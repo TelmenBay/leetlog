@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Timer from "./components/timer";
 
 export default function Home() {
   return (
@@ -23,6 +24,16 @@ export default function Home() {
           </button>
         </div>
       </header>
+      <main className="flex-1 p-6">
+        <Timer />
+      </main>
+      <footer className="p-6">
+        <div className="flex justify-center items-center">
+          <p className="text-sm text-gray-500">
+            &copy; {new Date().getFullYear()} LeetLog. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
