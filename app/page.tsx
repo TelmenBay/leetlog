@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Timer from "./components/timer";
 import GitHubStar from "./components/github-star";
 
 export default function Home() {
@@ -29,8 +28,10 @@ export default function Home() {
           </button>
         </div>
       </header>
-      <main className="flex-1 p-6">
-        <Timer />
+      <main className="flex-1 flex items-center justify-center p-6">
+        <h1 className="text-5xl md:text-6xl text-center text-white" style={{ fontFamily: 'var(--font-jost)' }}>
+          Log your approaches + time + insights.
+        </h1>
       </main>
       <footer className="p-6">
         <div className="flex justify-center items-center">
