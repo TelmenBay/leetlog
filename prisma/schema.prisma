@@ -39,17 +39,33 @@ model UserProblem {
   userId        String
   problemId     String
   status        String        @default("not_started") // not_started, in_progress, solved
-  timeSpent     Int?          // Time in minutes
-  notes         String?       @db.Text
-  solvedAt      DateTime?
-  needsReview   Boolean       @default(false) // For "Attention" column
+  timeSpent     Int?          // Time in seconds (best non-expired solve time, auto-updated from logs)
+  solvedAt      DateTime?     // First time this problem was solved
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
-  
+
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   problem       Problem       @relation(fields: [problemId], references: [id], onDelete: Cascade)
-  
+  logs          Log[]         // Relation to logs
+
   @@unique([userId, problemId]) // A user can only have one entry per problem
   @@index([userId])
   @@index([problemId])
+}
+
+model Log {
+  id            String        @id @default(cuid())
+  userProblemId String
+  timeSpent     Int           // Time in seconds for this session
+  solution      String?       @db.Text // Code/solution
+  notes         String?       @db.Text // Notes for this session
+  status        String?       // "solved", "attempted", "reviewed", etc.
+  expiresAt     DateTime?     // Log expires 1 month after creation (set in application code, nullable for old logs)
+  createdAt     DateTime      @default(now())
+  
+  userProblem   UserProblem   @relation(fields: [userProblemId], references: [id], onDelete: Cascade)
+  
+  @@index([userProblemId])
+  @@index([createdAt])
+  @@index([expiresAt])
 }
