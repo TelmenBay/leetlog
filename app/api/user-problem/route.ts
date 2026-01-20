@@ -23,8 +23,8 @@ export async function POST(request: NextRequest) {
 
     // Try to get user ID from session or fetch by email
     let userId = session.user.id as string;
-    
-    // If no ID, try to get it from email
+
+    // If no ID in session, try to get it from email
     if (!userId && session.user.email) {
       const user = await prisma.user.findUnique({
         where: { email: session.user.email }
@@ -33,10 +33,10 @@ export async function POST(request: NextRequest) {
         userId = user.id;
       }
     }
-    
-    if (!session?.user?.id) {
+
+    if (!userId) {
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: "Unauthorized - User not found" },
         { status: 401 }
       );
     }
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
     const existingUserProblem = await prisma.userProblem.findUnique({
       where: {
         userId_problemId: {
-          userId: session.user.id as string,
+          userId,
           problemId: problem.id
         }
       }
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
     // Create UserProblem relation
     const userProblem = await prisma.userProblem.create({
       data: {
-        userId: session.user.id as string,
+        userId,
         problemId: problem.id,
         status: "not_started"
       },

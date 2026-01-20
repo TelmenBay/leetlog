@@ -232,41 +232,43 @@ export default function DashboardClient({ userProblems }: DashboardClientProps) 
   return (
     <>
       {/* Add Problem Form */}
-      <form onSubmit={handleSubmit} className="mb-5 flex gap-3 items-end">
-        <div className="flex-1">
-          <label 
-            htmlFor="url" 
-            className="block text-white mb-2 text-sm"
+      <div className="mb-5">
+        <form onSubmit={handleSubmit} className="flex gap-3 items-end">
+          <div className="flex-1">
+            <label
+              htmlFor="url"
+              className="block text-white mb-2 text-sm"
+              style={{ fontFamily: 'var(--font-jost)' }}
+            >
+              LeetCode Problem URL
+            </label>
+            <input
+              type="url"
+              id="url"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="https://leetcode.com/problems/two-sum/"
+              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded text-white focus:outline-none focus:border-green-400"
+              style={{ fontFamily: 'var(--font-jost)' }}
+              required
+              disabled={loading}
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="text-xl rounded-lg bg-gray-900 border border-gray-800 px-6 py-2 text-green-400 hover:bg-green-400 hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
             style={{ fontFamily: 'var(--font-jost)' }}
           >
-            LeetCode Problem URL
-          </label>
-          <input
-            type="url"
-            id="url"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://leetcode.com/problems/two-sum/"
-            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded text-white focus:outline-none focus:border-green-400"
-            style={{ fontFamily: 'var(--font-jost)' }}
-            required
-            disabled={loading}
-          />
-          {error && (
-            <div className="mt-2 p-2 bg-red-900/30 border border-red-700 rounded text-red-400 text-sm">
-              {error}
-            </div>
-          )}
-        </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="text-xl rounded-lg bg-gray-900 border border-gray-800 px-6 py-2 text-green-400 hover:bg-green-400 hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-          style={{ fontFamily: 'var(--font-jost)' }}
-        >
-          {loading ? 'Adding...' : 'New Problem'}
-        </button>
-      </form>
+            {loading ? 'Adding...' : 'New Problem'}
+          </button>
+        </form>
+        {error && (
+          <div className="mt-2 p-2 bg-red-900/30 border border-red-700 rounded text-red-400 text-sm">
+            {error}
+          </div>
+        )}
+      </div>
       
       {/* Dashboard content - Spreadsheet style */}
       <div className="border border-gray-600 rounded-lg overflow-hidden bg-gray-800">
