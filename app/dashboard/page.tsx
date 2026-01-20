@@ -14,10 +14,8 @@ export default async function DashboardPage() {
     redirect("/sign-in");
   }
 
-  
-  // Fetch user's problems with related problem data and logs
   const now = new Date();
-  
+
   try {
     const userProblemsData = await prisma.userProblem.findMany({
       where: {
@@ -27,7 +25,7 @@ export default async function DashboardPage() {
         problem: true,
         logs: {
           orderBy: { createdAt: 'desc' },
-          take: 20, // Get more logs, we'll filter expired ones
+          take: 20,
         }
       },
       orderBy: {
@@ -35,22 +33,18 @@ export default async function DashboardPage() {
       }
     });
 
-    // Map userProblems and include all non-expired logs
     const userProblems = userProblemsData.map(userProblem => {
       const logs = userProblem.logs || [];
 
-      // Filter non-expired logs
       const nonExpiredLogs = logs.filter((log) => {
-        // If expiresAt exists, check if it's in the future
         if (log.expiresAt) {
           return new Date(log.expiresAt) > now;
         }
-        // If expiresAt doesn't exist (old logs), calculate: createdAt + 30 days
         const createdAt = new Date(log.createdAt);
         const calculatedExpiresAt = new Date(createdAt);
         calculatedExpiresAt.setDate(calculatedExpiresAt.getDate() + 30);
         return calculatedExpiresAt > now;
-      }).slice(0, 10); // Take latest 10 non-expired
+      }).slice(0, 10);
 
       return {
         id: userProblem.id,
@@ -63,30 +57,29 @@ export default async function DashboardPage() {
     });
 
     return (
-      <div className="flex flex-col min-h-screen">
-        {/* Header */}
-        <header className="flex justify-between items-center p-6 border-b border-gray-700">
+      <div className="flex flex-col min-h-screen bg-[#F5F4F0]">
+        <header className="flex justify-between items-center px-8 py-4 bg-white border-b border-[#E5E5E5]">
           <div className="flex items-center">
             <Image
               src="/white_LL.jpg"
               alt="LeetLog Logo"
-              width={120}
-              height={120}
-              className="object-contain"
+              width={100}
+              height={100}
+              className="object-contain invert"
             />
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="text-white" style={{ fontFamily: 'var(--font-jost)' }}>
+            <span className="text-[#6B6B6B] text-sm" style={{ fontFamily: 'var(--font-jost)' }}>
               {session.user?.email || session.user?.name}
             </span>
             <form action={async () => {
               "use server";
               await signOut({ redirectTo: "/" });
             }}>
-              <button 
+              <button
                 type="submit"
-                className="text-xl border-2 border-white px-6 py-2 text-white hover:bg-white hover:text-black transition-colors"
+                className="text-sm font-medium border border-[#E5E5E5] px-4 py-2 text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white hover:border-[#1A1A1A] transition-colors rounded-sm"
               >
                 Sign Out
               </button>
@@ -94,9 +87,9 @@ export default async function DashboardPage() {
           </div>
         </header>
 
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-8">
           <div className="max-w-7xl mx-auto">
-            <h1 className="text-4xl font-semibold text-white mb-8" style={{ fontFamily: 'var(--font-jost)' }}>
+            <h1 className="text-3xl font-semibold text-[#1A1A1A] mb-6" style={{ fontFamily: 'var(--font-jost)' }}>
               Dashboard
             </h1>
 
@@ -108,8 +101,8 @@ export default async function DashboardPage() {
   } catch (error) {
     console.error('Error fetching dashboard data:', error);
     return (
-      <div className="flex flex-col min-h-screen items-center justify-center">
-        <p className="text-white">Error loading dashboard. Please refresh the page.</p>
+      <div className="flex flex-col min-h-screen items-center justify-center bg-[#F5F4F0]">
+        <p className="text-[#1A1A1A]">Error loading dashboard. Please refresh the page.</p>
       </div>
     );
   }

@@ -38,17 +38,16 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
+    <div className="min-h-screen flex items-center justify-center p-6 bg-[#F5F4F0]">
       <div className="w-full max-w-md">
-        <div className="bg-gray-800 border border-gray-700 p-8">
-          <h1 className="text-3xl font-semibold text-white text-center mb-6" style={{ fontFamily: 'var(--font-jost)' }}>
+        <div className="bg-white p-8 rounded-sm shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
+          <h1 className="text-2xl font-semibold text-[#1A1A1A] text-center mb-6" style={{ fontFamily: 'var(--font-jost)' }}>
             Sign In
           </h1>
 
-          {/* Credentials Form */}
           <form onSubmit={handleCredentialsSubmit} className="space-y-4 mb-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
                 Email
               </label>
               <input
@@ -57,13 +56,13 @@ export default function SignInPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
+                className="w-full px-3 py-2.5 bg-[#FAFAFA] border border-[#E5E5E5] rounded-sm text-[#1A1A1A] placeholder-[#9CA3AF] focus:outline-none focus:border-[#1A1A1A] transition-colors"
                 placeholder="you@example.com"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
                 Password
               </label>
               <input
@@ -72,37 +71,34 @@ export default function SignInPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
+                className="w-full px-3 py-2.5 bg-[#FAFAFA] border border-[#E5E5E5] rounded-sm text-[#1A1A1A] placeholder-[#9CA3AF] focus:outline-none focus:border-[#1A1A1A] transition-colors"
                 placeholder="••••••••"
               />
             </div>
 
             {error && (
-              <div className="text-red-400 text-sm text-center">{error}</div>
+              <div className="text-red-500 text-sm text-center">{error}</div>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-white text-black py-2 px-4 rounded-md font-semibold hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-[#1A1A1A] text-white py-2.5 px-4 rounded-sm font-medium hover:bg-[#333] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Signing in..." : "Sign In"}
             </button>
           </form>
 
-
-          {/* Divider */}
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-600"></div>
+              <div className="w-full border-t border-[#E5E5E5]"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-800 text-gray-400">Or continue with</span>
+              <span className="px-3 bg-white text-[#6B6B6B]">Or continue with</span>
             </div>
           </div>
 
-          {/* GitHub OAuth */}
-          <div className="mb-6 flex justify-center">
+          <div className="flex justify-center">
             <GithubSignIn />
           </div>
         </div>

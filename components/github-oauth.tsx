@@ -5,12 +5,12 @@ import Image from "next/image";
 
 const GithubSignIn = () => {
     return (
-        <button 
+        <button
             onClick={() => signIn("github", { callbackUrl: "/dashboard" })}
-            className="flex items-center gap-2 text-xl border-3 px-6 py-4 flex-row"
+            className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-[#1A1A1A] text-white font-medium rounded-sm hover:bg-[#333] transition-colors"
         >
-            <Image className="dark:invert" src="/github.svg" alt="GitHub" width={20} height={20} />
-            Continue with Github
+            <Image src="/github.svg" alt="GitHub" width={18} height={18} className="invert" />
+            Continue with GitHub
         </button>
     )
 }

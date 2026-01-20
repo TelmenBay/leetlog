@@ -110,69 +110,69 @@ export default function LogProblemModal({
 
   const getStatusBadge = (logStatus: string | null) => {
     if (logStatus === 'solved') {
-      return <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-500/20 text-green-400 border border-green-500/30">Solved</span>;
+      return <span className="px-2 py-0.5 text-xs font-medium rounded-sm bg-green-100 text-green-700 border border-green-200">Solved</span>;
     }
-    return <span className="px-2 py-1 text-xs font-medium rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">Attempted</span>;
+    return <span className="px-2 py-0.5 text-xs font-medium rounded-sm bg-yellow-100 text-yellow-700 border border-yellow-200">Attempted</span>;
   };
 
   if (!isOpen) return null;
 
   return (
     <div
-      className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <div
-        className="bg-gray-900 border border-gray-700 rounded-lg w-[95vw] h-[90vh] flex flex-col"
+        className="bg-white rounded-sm shadow-[0_4px_20px_rgba(0,0,0,0.15)] w-[95vw] h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-700 shrink-0">
-          <h2 className="text-2xl font-semibold text-white" style={{ fontFamily: 'var(--font-jost)' }}>
+        <div className="flex justify-between items-center p-6 border-b border-[#E5E5E5] shrink-0">
+          <h2 className="text-xl font-semibold text-[#1A1A1A]" style={{ fontFamily: 'var(--font-jost)' }}>
             {problemTitle}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white text-2xl w-8 h-8 flex items-center justify-center rounded hover:bg-gray-800 transition-colors"
+            className="text-[#6B6B6B] hover:text-[#1A1A1A] text-2xl w-8 h-8 flex items-center justify-center rounded-sm hover:bg-[#F5F4F0] transition-colors"
           >
             ×
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-gray-700 px-6 shrink-0">
+        <div className="flex border-b border-[#E5E5E5] px-6 shrink-0">
           <button
             onClick={() => setActiveTab('new')}
             className={`px-4 py-3 text-sm font-medium transition-colors relative ${
               activeTab === 'new'
-                ? 'text-green-400'
-                : 'text-gray-400 hover:text-white'
+                ? 'text-[#1A1A1A]'
+                : 'text-[#6B6B6B] hover:text-[#1A1A1A]'
             }`}
             style={{ fontFamily: 'var(--font-jost)' }}
           >
             New Log
             {activeTab === 'new' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-green-400" />
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1A1A1A]" />
             )}
           </button>
           <button
             onClick={() => setActiveTab('history')}
             className={`px-4 py-3 text-sm font-medium transition-colors relative ${
               activeTab === 'history'
-                ? 'text-green-400'
-                : 'text-gray-400 hover:text-white'
+                ? 'text-[#1A1A1A]'
+                : 'text-[#6B6B6B] hover:text-[#1A1A1A]'
             }`}
             style={{ fontFamily: 'var(--font-jost)' }}
           >
             History ({logs.length})
             {activeTab === 'history' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-green-400" />
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1A1A1A]" />
             )}
           </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden bg-[#FAFAFA]">
           {activeTab === 'new' ? (
             <div className="h-full p-6 overflow-y-auto">
               {/* Two Column Layout - Left: Timer/Status/Notes, Right: Code */}
@@ -181,26 +181,26 @@ export default function LogProblemModal({
                 <div className="flex flex-col gap-5 overflow-y-auto">
                   {/* Timer Section */}
                   <div>
-                    <label className="block text-white mb-3 text-sm font-semibold" style={{ fontFamily: 'var(--font-jost)' }}>
+                    <label className="block text-[#1A1A1A] mb-3 text-sm font-semibold" style={{ fontFamily: 'var(--font-jost)' }}>
                       Timer
                     </label>
 
                     {/* Timer Display */}
                     <div className="flex items-center justify-center gap-2 mb-4">
-                      <div className="bg-gray-800 rounded-lg p-3 flex items-center justify-center min-w-16">
-                        <span className="text-3xl font-mono font-light text-gray-300 tracking-tight">
+                      <div className="bg-white border border-[#E5E5E5] rounded-sm p-3 flex items-center justify-center min-w-16">
+                        <span className="text-3xl font-mono font-light text-[#1A1A1A] tracking-tight">
                           {formatTimeDisplay(hours)}
                         </span>
                       </div>
-                      <span className="text-2xl text-gray-400 font-light">:</span>
-                      <div className="bg-gray-800 rounded-lg p-3 flex items-center justify-center min-w-16">
-                        <span className="text-3xl font-mono font-light text-gray-300 tracking-tight">
+                      <span className="text-2xl text-[#6B6B6B] font-light">:</span>
+                      <div className="bg-white border border-[#E5E5E5] rounded-sm p-3 flex items-center justify-center min-w-16">
+                        <span className="text-3xl font-mono font-light text-[#1A1A1A] tracking-tight">
                           {formatTimeDisplay(minutes)}
                         </span>
                       </div>
-                      <span className="text-2xl text-gray-400 font-light">:</span>
-                      <div className="bg-gray-800 rounded-lg p-3 flex items-center justify-center min-w-16">
-                        <span className="text-3xl font-mono font-light text-gray-300 tracking-tight">
+                      <span className="text-2xl text-[#6B6B6B] font-light">:</span>
+                      <div className="bg-white border border-[#E5E5E5] rounded-sm p-3 flex items-center justify-center min-w-16">
+                        <span className="text-3xl font-mono font-light text-[#1A1A1A] tracking-tight">
                           {formatTimeDisplay(seconds)}
                         </span>
                       </div>
@@ -210,27 +210,27 @@ export default function LogProblemModal({
                     <div className="flex justify-center gap-3">
                       <button
                         onClick={() => setIsRunning(!isRunning)}
-                        className="px-4 py-2 bg-white text-black hover:bg-gray-200 transition-colors font-semibold rounded flex items-center gap-2 text-sm"
+                        className="px-4 py-2 bg-[#1A1A1A] text-white hover:bg-[#333] transition-colors font-medium rounded-sm flex items-center gap-2 text-sm"
                         style={{ fontFamily: 'var(--font-jost)' }}
                       >
                         {isRunning ? (
                           <>
-                            <img src="/pause.svg" alt="Pause" className="w-4 h-4" />
+                            <img src="/pause.svg" alt="Pause" className="w-4 h-4 invert" />
                             <span>Pause</span>
                           </>
                         ) : (
                           <>
-                            <img src="/play.svg" alt="Play" className="w-4 h-4" />
+                            <img src="/play.svg" alt="Play" className="w-4 h-4 invert" />
                             <span>Start</span>
                           </>
                         )}
                       </button>
                       <button
                         onClick={handleReset}
-                        className="px-4 py-2 border-2 border-white text-white hover:bg-gray-800 transition-colors rounded flex items-center gap-2 text-sm"
+                        className="px-4 py-2 border border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F4F0] transition-colors rounded-sm flex items-center gap-2 text-sm"
                         style={{ fontFamily: 'var(--font-jost)' }}
                       >
-                        <img src="/reset-left-fill.svg" alt="Reset" className="w-4 h-4 dark:invert" />
+                        <img src="/reset-left-fill.svg" alt="Reset" className="w-4 h-4" />
                         <span>Reset</span>
                       </button>
                     </div>
@@ -238,15 +238,15 @@ export default function LogProblemModal({
 
                   {/* Status Selection */}
                   <div>
-                    <label className="block text-white mb-2 text-sm font-semibold" style={{ fontFamily: 'var(--font-jost)' }}>
+                    <label className="block text-[#1A1A1A] mb-2 text-sm font-semibold" style={{ fontFamily: 'var(--font-jost)' }}>
                       Status
                     </label>
                     <div className="flex flex-col gap-2">
                       <label
-                        className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                        className={`flex items-center gap-3 p-3 rounded-sm border cursor-pointer transition-all ${
                           status === 'solved'
-                            ? 'border-green-500 bg-green-500/10'
-                            : 'border-gray-700 hover:border-gray-600'
+                            ? 'border-green-500 bg-green-50'
+                            : 'border-[#E5E5E5] bg-white hover:border-[#D4D4D4]'
                         }`}
                       >
                         <input
@@ -255,18 +255,18 @@ export default function LogProblemModal({
                           value="solved"
                           checked={status === 'solved'}
                           onChange={(e) => setStatus(e.target.value as 'solved' | 'attempted')}
-                          className="w-4 h-4 text-green-500 bg-gray-800 border-gray-600 focus:ring-green-500"
+                          className="w-4 h-4 text-green-600 bg-white border-[#D4D4D4] focus:ring-green-500"
                         />
                         <div>
-                          <span className="text-white font-medium text-sm" style={{ fontFamily: 'var(--font-jost)' }}>Solved</span>
-                          <p className="text-gray-400 text-xs">Completed without help</p>
+                          <span className="text-[#1A1A1A] font-medium text-sm" style={{ fontFamily: 'var(--font-jost)' }}>Solved</span>
+                          <p className="text-[#6B6B6B] text-xs">Completed without help</p>
                         </div>
                       </label>
                       <label
-                        className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                        className={`flex items-center gap-3 p-3 rounded-sm border cursor-pointer transition-all ${
                           status === 'attempted'
-                            ? 'border-yellow-500 bg-yellow-500/10'
-                            : 'border-gray-700 hover:border-gray-600'
+                            ? 'border-yellow-500 bg-yellow-50'
+                            : 'border-[#E5E5E5] bg-white hover:border-[#D4D4D4]'
                         }`}
                       >
                         <input
@@ -275,21 +275,21 @@ export default function LogProblemModal({
                           value="attempted"
                           checked={status === 'attempted'}
                           onChange={(e) => setStatus(e.target.value as 'solved' | 'attempted')}
-                          className="w-4 h-4 text-yellow-500 bg-gray-800 border-gray-600 focus:ring-yellow-500"
+                          className="w-4 h-4 text-yellow-600 bg-white border-[#D4D4D4] focus:ring-yellow-500"
                         />
                         <div>
-                          <span className="text-white font-medium text-sm" style={{ fontFamily: 'var(--font-jost)' }}>Attempted</span>
-                          <p className="text-gray-400 text-xs">Needed hints or gave up</p>
+                          <span className="text-[#1A1A1A] font-medium text-sm" style={{ fontFamily: 'var(--font-jost)' }}>Attempted</span>
+                          <p className="text-[#6B6B6B] text-xs">Needed hints or gave up</p>
                         </div>
                       </label>
                     </div>
                   </div>
 
                   {/* Notes Section */}
-                  <div className="flex-1 flex flex-col min-h-[200px]">
+                  <div className="flex-1 flex flex-col min-h-50">
                     <label
                       htmlFor="notes"
-                      className="block text-white mb-2 text-sm font-semibold"
+                      className="block text-[#1A1A1A] mb-2 text-sm font-semibold"
                       style={{ fontFamily: 'var(--font-jost)' }}
                     >
                       Notes
@@ -299,29 +299,29 @@ export default function LogProblemModal({
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                       placeholder="Add your notes, insights, or approach here..."
-                      className="flex-1 w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-green-400 resize-none text-sm"
+                      className="flex-1 w-full px-3 py-2 bg-white border border-[#E5E5E5] rounded-sm text-[#1A1A1A] placeholder-[#9CA3AF] focus:outline-none focus:border-[#1A1A1A] resize-none text-sm"
                       style={{ fontFamily: 'var(--font-jost)' }}
                     />
                   </div>
                 </div>
 
-                {/* Right Column: Solution (Code) */}
+                {/* Right Column: Solution (Code) - Keep dark for code readability */}
                 <div className="flex flex-col h-full">
                   <label
                     htmlFor="solution"
-                    className="block text-white mb-2 text-sm font-semibold"
+                    className="block text-[#1A1A1A] mb-2 text-sm font-semibold"
                     style={{ fontFamily: 'var(--font-jost)' }}
                   >
                     Solution (Code)
                   </label>
-                  <div className="flex-1 relative rounded-lg overflow-hidden border border-gray-600 bg-gray-950">
+                  <div className="flex-1 relative rounded-sm overflow-hidden border border-[#E5E5E5] bg-[#1A1A1A]">
                     {/* Line numbers gutter */}
-                    <div className="absolute left-0 top-0 bottom-0 w-10 bg-gray-900/50 border-r border-gray-700 overflow-hidden pointer-events-none">
+                    <div className="absolute left-0 top-0 bottom-0 w-10 bg-[#111] border-r border-[#333] overflow-hidden pointer-events-none">
                       <div className="py-3 pr-2 text-right">
                         {(solution || ' ').split('\n').map((_, i) => (
                           <div
                             key={i}
-                            className="text-gray-500 text-sm leading-[21px] font-mono select-none"
+                            className="text-[#6B6B6B] text-sm leading-5.25 font-mono select-none"
                           >
                             {i + 1}
                           </div>
@@ -334,7 +334,7 @@ export default function LogProblemModal({
                       onChange={(e) => setSolution(e.target.value)}
                       placeholder="Paste your solution code here..."
                       wrap="off"
-                      className="w-full h-full pl-12 pr-4 py-3 bg-transparent text-gray-100 focus:outline-none resize-none text-sm leading-[21px]"
+                      className="w-full h-full pl-12 pr-4 py-3 bg-transparent text-gray-100 placeholder-[#6B6B6B] focus:outline-none resize-none text-sm leading-5.25"
                       style={{
                         fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
                         tabSize: 2
@@ -349,7 +349,7 @@ export default function LogProblemModal({
             /* History Tab */
             <div className="h-full p-6 overflow-y-auto">
               {logs.length === 0 ? (
-                <div className="flex items-center justify-center h-full text-gray-400" style={{ fontFamily: 'var(--font-jost)' }}>
+                <div className="flex items-center justify-center h-full text-[#6B6B6B]" style={{ fontFamily: 'var(--font-jost)' }}>
                   No logs yet. Create your first log!
                 </div>
               ) : (
@@ -357,24 +357,24 @@ export default function LogProblemModal({
                   {logs.map((log) => (
                     <div
                       key={log.id}
-                      className="border border-gray-700 rounded-lg overflow-hidden bg-gray-800/50"
+                      className="border border-[#E5E5E5] rounded-sm overflow-hidden bg-white"
                     >
                       {/* Log Header - Always visible */}
                       <button
                         onClick={() => setExpandedLogId(expandedLogId === log.id ? null : log.id)}
-                        className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-800 transition-colors"
+                        className="w-full px-4 py-3 flex items-center justify-between hover:bg-[#FAFAFA] transition-colors"
                       >
                         <div className="flex items-center gap-4">
                           {getStatusBadge(log.status)}
-                          <span className="text-white font-medium" style={{ fontFamily: 'var(--font-jost)' }}>
+                          <span className="text-[#1A1A1A] font-medium" style={{ fontFamily: 'var(--font-jost)' }}>
                             {formatTimeSeconds(log.timeSpent)}
                           </span>
-                          <span className="text-gray-400 text-sm" style={{ fontFamily: 'var(--font-jost)' }}>
+                          <span className="text-[#6B6B6B] text-sm" style={{ fontFamily: 'var(--font-jost)' }}>
                             {formatDate(log.createdAt)}
                           </span>
                         </div>
                         <svg
-                          className={`w-5 h-5 text-gray-400 transition-transform ${expandedLogId === log.id ? 'rotate-180' : ''}`}
+                          className={`w-5 h-5 text-[#6B6B6B] transition-transform ${expandedLogId === log.id ? 'rotate-180' : ''}`}
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -385,36 +385,36 @@ export default function LogProblemModal({
 
                       {/* Expanded Content */}
                       {expandedLogId === log.id && (
-                        <div className="px-4 pb-4 border-t border-gray-700">
+                        <div className="px-4 pb-4 border-t border-[#E5E5E5]">
                           <div className="grid grid-cols-2 gap-4 mt-4">
                             {/* Notes */}
                             <div>
-                              <label className="block text-gray-400 text-xs font-medium mb-2" style={{ fontFamily: 'var(--font-jost)' }}>
+                              <label className="block text-[#6B6B6B] text-xs font-medium mb-2" style={{ fontFamily: 'var(--font-jost)' }}>
                                 Notes
                               </label>
-                              <div className="bg-gray-900 rounded-lg p-3 min-h-32 max-h-64 overflow-y-auto">
+                              <div className="bg-[#FAFAFA] rounded-sm p-3 min-h-32 max-h-64 overflow-y-auto border border-[#E5E5E5]">
                                 {log.notes ? (
-                                  <p className="text-gray-300 text-sm whitespace-pre-wrap" style={{ fontFamily: 'var(--font-jost)' }}>
+                                  <p className="text-[#1A1A1A] text-sm whitespace-pre-wrap" style={{ fontFamily: 'var(--font-jost)' }}>
                                     {log.notes}
                                   </p>
                                 ) : (
-                                  <p className="text-gray-500 text-sm italic">No notes</p>
+                                  <p className="text-[#9CA3AF] text-sm italic">No notes</p>
                                 )}
                               </div>
                             </div>
 
-                            {/* Solution */}
+                            {/* Solution - Keep dark for code */}
                             <div>
-                              <label className="block text-gray-400 text-xs font-medium mb-2" style={{ fontFamily: 'var(--font-jost)' }}>
+                              <label className="block text-[#6B6B6B] text-xs font-medium mb-2" style={{ fontFamily: 'var(--font-jost)' }}>
                                 Solution
                               </label>
-                              <div className="bg-gray-950 rounded-lg p-3 min-h-32 max-h-64 overflow-auto">
+                              <div className="bg-[#1A1A1A] rounded-sm p-3 min-h-32 max-h-64 overflow-auto">
                                 {log.solution ? (
                                   <pre className="text-gray-300 text-sm whitespace-pre font-mono">
                                     {log.solution}
                                   </pre>
                                 ) : (
-                                  <p className="text-gray-500 text-sm italic">No solution</p>
+                                  <p className="text-[#6B6B6B] text-sm italic">No solution</p>
                                 )}
                               </div>
                             </div>
@@ -431,11 +431,11 @@ export default function LogProblemModal({
 
         {/* Footer - Only show on New Log tab */}
         {activeTab === 'new' && (
-          <div className="flex gap-3 justify-end p-6 border-t border-gray-700 shrink-0">
+          <div className="flex gap-3 justify-end p-6 border-t border-[#E5E5E5] shrink-0 bg-white">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 border border-gray-700 text-white hover:bg-gray-800 rounded-lg transition-colors"
+              className="px-5 py-2.5 border border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F4F0] rounded-sm transition-colors"
               style={{ fontFamily: 'var(--font-jost)' }}
             >
               Cancel
@@ -443,7 +443,7 @@ export default function LogProblemModal({
             <button
               onClick={handleSave}
               disabled={loading || (time === 0 && !notes.trim() && !solution.trim())}
-              className="px-5 py-2.5 bg-green-500 text-black font-medium hover:bg-green-400 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 py-2.5 bg-[#1A1A1A] text-white font-medium hover:bg-[#333] rounded-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               style={{ fontFamily: 'var(--font-jost)' }}
             >
               {loading ? 'Saving...' : 'Save Log'}

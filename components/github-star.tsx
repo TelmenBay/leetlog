@@ -1,4 +1,3 @@
-// app/components/GitHubStar.tsx
 'use client';
 
 import { useState, useEffect } from "react";
@@ -26,12 +25,12 @@ export default function GitHubStar() {
       href={`https://github.com/${repoOwner}/${repoName}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="border-2 border-white px-4 py-2 flex items-center gap-2 text-white hover:text-gray-300 transition-colors"
+      className="border border-[#D4D4D4] px-3 py-1.5 flex items-center gap-2 text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white hover:border-[#1A1A1A] transition-colors rounded-sm"
     >
-      <img src="/github.svg" alt="GitHub" className="w-6 h-6 dark:invert" />
-      <img src="/star.svg" alt="Star" className="w-4 h-4 dark:invert" />
+      <img src="/github.svg" alt="GitHub" className="w-5 h-5" />
+      <img src="/star.svg" alt="Star" className="w-4 h-4" />
       {stars !== null && (
-          <span className="text-xl">{stars}</span>
+        <span className="text-sm font-medium">{stars}</span>
       )}
     </a>
   );

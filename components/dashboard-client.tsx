@@ -35,13 +35,13 @@ export default function DashboardClient({ userProblems }: DashboardClientProps) 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
       case 'easy':
-        return 'text-green-400';
+        return 'text-green-600';
       case 'medium':
-        return 'text-yellow-400';
+        return 'text-yellow-600';
       case 'hard':
-        return 'text-red-400';
+        return 'text-red-600';
       default:
-        return 'text-white';
+        return 'text-[#1A1A1A]';
     }
   };
 
@@ -160,15 +160,15 @@ export default function DashboardClient({ userProblems }: DashboardClientProps) 
   const getReadinessBadge = (readiness: string) => {
     switch (readiness.toLowerCase()) {
       case 'mastered':
-        return 'bg-green-500/20 text-green-400 border-green-500/30';
+        return 'bg-green-100 text-green-700 border-green-200';
       case 'revisit':
-        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
+        return 'bg-yellow-100 text-yellow-700 border-yellow-200';
       case 'weak':
-        return 'bg-red-500/20 text-red-400 border-red-500/30';
+        return 'bg-red-100 text-red-700 border-red-200';
       case 'rusty':
-        return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+        return 'bg-orange-100 text-orange-700 border-orange-200';
       default:
-        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+        return 'bg-gray-100 text-gray-600 border-gray-200';
     }
   };
 
@@ -237,7 +237,7 @@ export default function DashboardClient({ userProblems }: DashboardClientProps) 
           <div className="flex-1">
             <label
               htmlFor="url"
-              className="block text-white mb-2 text-sm"
+              className="block text-[#1A1A1A] mb-1.5 text-sm font-medium"
               style={{ fontFamily: 'var(--font-jost)' }}
             >
               LeetCode Problem URL
@@ -248,7 +248,7 @@ export default function DashboardClient({ userProblems }: DashboardClientProps) 
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://leetcode.com/problems/two-sum/"
-              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded text-white focus:outline-none focus:border-green-400"
+              className="w-full px-3 py-2.5 bg-white border border-[#E5E5E5] rounded-sm text-[#1A1A1A] placeholder-[#9CA3AF] focus:outline-none focus:border-[#1A1A1A] transition-colors"
               style={{ fontFamily: 'var(--font-jost)' }}
               required
               disabled={loading}
@@ -257,51 +257,51 @@ export default function DashboardClient({ userProblems }: DashboardClientProps) 
           <button
             type="submit"
             disabled={loading}
-            className="text-xl rounded-lg bg-gray-900 border border-gray-800 px-6 py-2 text-green-400 hover:bg-green-400 hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+            className="text-sm font-medium rounded-sm bg-[#1A1A1A] px-5 py-2.5 text-white hover:bg-[#333] transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
             style={{ fontFamily: 'var(--font-jost)' }}
           >
             {loading ? 'Adding...' : 'New Problem'}
           </button>
         </form>
         {error && (
-          <div className="mt-2 p-2 bg-red-900/30 border border-red-700 rounded text-red-400 text-sm">
+          <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-sm text-red-600 text-sm">
             {error}
           </div>
         )}
       </div>
       
       {/* Dashboard content - Spreadsheet style */}
-      <div className="border border-gray-600 rounded-lg overflow-hidden bg-gray-800">
+      <div className="bg-white rounded-sm shadow-[0_1px_3px_rgba(0,0,0,0.08)] overflow-hidden">
         {/* Table Header */}
         <div
-          className="grid grid-cols-[50px_1fr_180px_100px_120px_120px_120px] gap-0 items-center bg-gray-900 border-b-2 border-gray-700"
+          className="grid grid-cols-[50px_1fr_180px_100px_120px_120px_120px] gap-0 items-center bg-[#FAFAFA] border-b border-[#E5E5E5]"
         >
-          <div className="px-3 py-3 border-r border-gray-700">
-            <span className="text-white text-sm font-semibold" style={{ fontFamily: 'var(--font-jost)' }}>#</span>
+          <div className="px-3 py-3 border-r border-[#E5E5E5]">
+            <span className="text-[#6B6B6B] text-xs font-semibold uppercase tracking-wide" style={{ fontFamily: 'var(--font-jost)' }}>#</span>
           </div>
-          <div className="px-3 py-3 border-r border-gray-700">
-            <span className="text-white text-sm font-semibold" style={{ fontFamily: 'var(--font-jost)' }}>Problems</span>
+          <div className="px-3 py-3 border-r border-[#E5E5E5]">
+            <span className="text-[#6B6B6B] text-xs font-semibold uppercase tracking-wide" style={{ fontFamily: 'var(--font-jost)' }}>Problem</span>
           </div>
-          <div className="px-3 py-3 border-r border-gray-700">
-            <span className="text-white text-sm font-semibold" style={{ fontFamily: 'var(--font-jost)' }}>Topics</span>
+          <div className="px-3 py-3 border-r border-[#E5E5E5]">
+            <span className="text-[#6B6B6B] text-xs font-semibold uppercase tracking-wide" style={{ fontFamily: 'var(--font-jost)' }}>Topics</span>
           </div>
-          <div className="px-3 py-3 border-r border-gray-700">
-            <span className="text-white text-sm font-semibold" style={{ fontFamily: 'var(--font-jost)' }}>Difficulty</span>
+          <div className="px-3 py-3 border-r border-[#E5E5E5]">
+            <span className="text-[#6B6B6B] text-xs font-semibold uppercase tracking-wide" style={{ fontFamily: 'var(--font-jost)' }}>Difficulty</span>
           </div>
-          <div className="px-3 py-3 border-r border-gray-700">
-            <span className="text-white text-sm font-semibold" style={{ fontFamily: 'var(--font-jost)' }}>Time</span>
+          <div className="px-3 py-3 border-r border-[#E5E5E5]">
+            <span className="text-[#6B6B6B] text-xs font-semibold uppercase tracking-wide" style={{ fontFamily: 'var(--font-jost)' }}>Time</span>
           </div>
-          <div className="px-3 py-3 border-r border-gray-700">
-            <span className="text-white text-sm font-semibold" style={{ fontFamily: 'var(--font-jost)' }}>Last Logged</span>
+          <div className="px-3 py-3 border-r border-[#E5E5E5]">
+            <span className="text-[#6B6B6B] text-xs font-semibold uppercase tracking-wide" style={{ fontFamily: 'var(--font-jost)' }}>Last Logged</span>
           </div>
-          <div className="px-3 py-3 border-r border-gray-700">
-            <span className="text-white text-sm font-semibold" style={{ fontFamily: 'var(--font-jost)' }}>Readiness</span>
+          <div className="px-3 py-3">
+            <span className="text-[#6B6B6B] text-xs font-semibold uppercase tracking-wide" style={{ fontFamily: 'var(--font-jost)' }}>Readiness</span>
           </div>
         </div>
         
         {/* Table Rows */}
         {userProblems.length === 0 ? (
-          <div className="text-center py-12 text-gray-400" style={{ fontFamily: 'var(--font-jost)' }}>
+          <div className="text-center py-12 text-[#6B6B6B]" style={{ fontFamily: 'var(--font-jost)' }}>
             No problems added yet. Add your first problem to get started!
           </div>
         ) : (
@@ -310,60 +310,60 @@ export default function DashboardClient({ userProblems }: DashboardClientProps) 
               <div
                 key={userProblem.id}
                 onClick={() => handleLogClick(userProblem)}
-                className="grid grid-cols-[50px_1fr_180px_100px_120px_120px_120px] gap-0 items-center border-b border-gray-700 hover:bg-gray-700/30 transition-colors cursor-pointer"
+                className="grid grid-cols-[50px_1fr_180px_100px_120px_120px_120px] gap-0 items-center border-b border-[#E5E5E5] hover:bg-[#FAFAFA] transition-colors cursor-pointer"
               >
-                <div className="px-3 py-3 border-r border-gray-700">
-                  <span className="text-white text-sm" style={{ fontFamily: 'var(--font-jost)' }}>
+                <div className="px-3 py-3 border-r border-[#E5E5E5]">
+                  <span className="text-[#6B6B6B] text-sm" style={{ fontFamily: 'var(--font-jost)' }}>
                     {userProblem.problem.leetcodeId || index + 1}
                   </span>
                 </div>
-                <div className="px-3 py-3 border-r border-gray-700">
-                  <span className="text-white text-sm truncate block" style={{ fontFamily: 'var(--font-jost)' }}>
+                <div className="px-3 py-3 border-r border-[#E5E5E5]">
+                  <span className="text-[#1A1A1A] text-sm truncate block font-medium" style={{ fontFamily: 'var(--font-jost)' }}>
                     {userProblem.problem.title}
                   </span>
                 </div>
-                <div className="px-3 py-3 border-r border-gray-700">
+                <div className="px-3 py-3 border-r border-[#E5E5E5]">
                   <div className="flex flex-wrap gap-1">
                     {userProblem.problem.tags.slice(0, 2).map((tag, tagIndex) => (
                       <span
                         key={tagIndex}
-                        className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded"
+                        className="text-xs bg-[#F5F4F0] text-[#6B6B6B] px-2 py-0.5 rounded-sm"
                         style={{ fontFamily: 'var(--font-jost)' }}
                       >
                         {tag}
                       </span>
                     ))}
                     {userProblem.problem.tags.length > 2 && (
-                      <span className="text-xs text-gray-400" style={{ fontFamily: 'var(--font-jost)' }}>
+                      <span className="text-xs text-[#9CA3AF]" style={{ fontFamily: 'var(--font-jost)' }}>
                         +{userProblem.problem.tags.length - 2}
                       </span>
                     )}
                   </div>
                 </div>
-                <div className="px-3 py-3 border-r border-gray-700">
-                  <span className={`text-sm font-semibold ${getDifficultyColor(userProblem.problem.difficulty)}`} style={{ fontFamily: 'var(--font-jost)' }}>
+                <div className="px-3 py-3 border-r border-[#E5E5E5]">
+                  <span className={`text-sm font-medium ${getDifficultyColor(userProblem.problem.difficulty)}`} style={{ fontFamily: 'var(--font-jost)' }}>
                     {userProblem.problem.difficulty}
                   </span>
                 </div>
-                <div className="px-3 py-3 border-r border-gray-700">
-                  <span className="text-white text-sm" style={{ fontFamily: 'var(--font-jost)' }}>
+                <div className="px-3 py-3 border-r border-[#E5E5E5]">
+                  <span className="text-[#1A1A1A] text-sm" style={{ fontFamily: 'var(--font-jost)' }}>
                     {formatTime(userProblem.timeSpent)}
                   </span>
                 </div>
-                <div className="px-3 py-3 border-r border-gray-700">
-                  <span className="text-white text-sm" style={{ fontFamily: 'var(--font-jost)' }}>
+                <div className="px-3 py-3 border-r border-[#E5E5E5]">
+                  <span className="text-[#6B6B6B] text-sm" style={{ fontFamily: 'var(--font-jost)' }}>
                     {formatDate(userProblem.solvedAt)}
                   </span>
                 </div>
-                <div className="px-3 py-3 border-r border-gray-700">
+                <div className="px-3 py-3">
                   {(() => {
                     const readiness = calculateReadiness(userProblem);
                     if (readiness === '-') {
-                      return <span className="text-gray-400 text-sm">-</span>;
+                      return <span className="text-[#9CA3AF] text-sm">-</span>;
                     }
                     return (
                       <span
-                        className={`inline-block px-2.5 py-1 text-xs font-medium rounded-full border capitalize ${getReadinessBadge(readiness)}`}
+                        className={`inline-block px-2 py-0.5 text-xs font-medium rounded-sm border capitalize ${getReadinessBadge(readiness)}`}
                         style={{ fontFamily: 'var(--font-jost)' }}
                       >
                         {readiness}
