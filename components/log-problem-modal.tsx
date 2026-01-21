@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Log } from '@/lib/generated/prisma/client';
+import ConfirmModal, { shouldSkipConfirmation } from './confirm-modal';
 
 interface LogProblemModalProps {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface LogProblemModalProps {
   problemTitle: string;
   logs: Log[];
   onSave: (timeSpent: number, notes: string, solution: string, status: string) => Promise<void>;
+  onDeleteLog?: (logId: string) => Promise<void>;
 }
 
 export default function LogProblemModal({
@@ -16,7 +18,8 @@ export default function LogProblemModal({
   onClose,
   problemTitle,
   logs,
-  onSave
+  onSave,
+  onDeleteLog
 }: LogProblemModalProps) {
   const [time, setTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
@@ -26,6 +29,42 @@ export default function LogProblemModal({
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'new' | 'history'>('new');
   const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
+  const [deletingLogId, setDeletingLogId] = useState<string | null>(null);
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    logId: string | null;
+  }>({ isOpen: false, logId: null });
+
+  const performDeleteLog = async (logId: string) => {
+    if (!onDeleteLog) return;
+
+    setDeletingLogId(logId);
+    setConfirmModal({ isOpen: false, logId: null });
+
+    try {
+      await onDeleteLog(logId);
+      if (expandedLogId === logId) {
+        setExpandedLogId(null);
+      }
+    } catch (error) {
+      console.error('Failed to delete log:', error);
+    } finally {
+      setDeletingLogId(null);
+    }
+  };
+
+  const handleDeleteLog = async (logId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!onDeleteLog) return;
+
+    // Check if user wants to skip confirmation
+    if (shouldSkipConfirmation('deleteLogs')) {
+      performDeleteLog(logId);
+      return;
+    }
+
+    setConfirmModal({ isOpen: true, logId });
+  };
 
   // Timer logic
   useEffect(() => {
@@ -360,9 +399,9 @@ export default function LogProblemModal({
                       className="border border-[#E5E5E5] rounded-sm overflow-hidden bg-white"
                     >
                       {/* Log Header - Always visible */}
-                      <button
+                      <div
                         onClick={() => setExpandedLogId(expandedLogId === log.id ? null : log.id)}
-                        className="w-full px-4 py-3 flex items-center justify-between hover:bg-[#FAFAFA] transition-colors"
+                        className="w-full px-4 py-3 flex items-center justify-between hover:bg-[#FAFAFA] transition-colors cursor-pointer"
                       >
                         <div className="flex items-center gap-4">
                           {getStatusBadge(log.status)}
@@ -373,15 +412,29 @@ export default function LogProblemModal({
                             {formatDate(log.createdAt)}
                           </span>
                         </div>
-                        <svg
-                          className={`w-5 h-5 text-[#6B6B6B] transition-transform ${expandedLogId === log.id ? 'rotate-180' : ''}`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
+                        <div className="flex items-center gap-2">
+                          {onDeleteLog && (
+                            <button
+                              onClick={(e) => handleDeleteLog(log.id, e)}
+                              disabled={deletingLogId === log.id}
+                              className="p-1.5 text-[#9CA3AF] hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+                              title="Delete log"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          )}
+                          <svg
+                            className={`w-5 h-5 text-[#6B6B6B] transition-transform ${expandedLogId === log.id ? 'rotate-180' : ''}`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
+                      </div>
 
                       {/* Expanded Content */}
                       {expandedLogId === log.id && (
@@ -450,6 +503,17 @@ export default function LogProblemModal({
             </button>
           </div>
         )}
+
+        {/* Confirmation Modal for Log Deletion */}
+        <ConfirmModal
+          isOpen={confirmModal.isOpen}
+          onClose={() => setConfirmModal({ isOpen: false, logId: null })}
+          onConfirm={() => confirmModal.logId && performDeleteLog(confirmModal.logId)}
+          title="Delete Log"
+          message="Are you sure you want to delete this log? This action cannot be undone."
+          showDontAskAgain={true}
+          dontAskAgainKey="deleteLogs"
+        />
       </div>
     </div>
   );
