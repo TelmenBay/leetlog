@@ -1,48 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
 import { fetchLeetCodeProblem } from "@/lib/leetcode";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json(
-        { error: "Unauthorized - No session" },
-        { status: 401 }
-      );
-    }
-    
-    if (!session.user) {
-      return NextResponse.json(
-        { error: "Unauthorized - No user in session" },
+        { error: "Unauthorized" },
         { status: 401 }
       );
     }
 
-    // Try to get user ID from session or fetch by email
-    let userId = session.user.id as string;
-
-    // If no ID in session, try to get it from email
-    if (!userId && session.user.email) {
-      const user = await prisma.user.findUnique({
-        where: { email: session.user.email }
-      });
-      if (user) {
-        userId = user.id;
-      }
-    }
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized - User not found" },
-        { status: 401 }
-      );
-    }
+    const userId = user.id;
 
     const { url } = await request.json();
-    
+
     if (!url || !url.includes('leetcode.com/problems/')) {
       return NextResponse.json(
         { error: "Invalid LeetCode URL" },
@@ -61,7 +37,7 @@ export async function POST(request: NextRequest) {
 
     // Fetch problem data from LeetCode
     const problemData = await fetchLeetCodeProblem(url);
-    
+
     if (!problemData) {
       return NextResponse.json(
         { error: "Failed to fetch problem data from LeetCode" },
@@ -119,13 +95,13 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
-      userProblem 
+      userProblem
     }, { status: 201 });
   } catch (error: any) {
     console.error("Error:", error);
-    
+
     // Handle unique constraint violation
     if (error.code === 'P2002') {
       return NextResponse.json(
@@ -133,7 +109,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    
+
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

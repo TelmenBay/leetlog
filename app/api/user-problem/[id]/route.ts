@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -12,9 +12,10 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    
-    if (!session?.user?.id) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -23,7 +24,7 @@ export async function POST(
 
     const { id } = await params;
     const { timeSpent, notes, solution, status } = await request.json();
-    
+
     // Verify the userProblem belongs to the current user
     const userProblem = await prisma.userProblem.findUnique({
       where: { id },
@@ -37,7 +38,7 @@ export async function POST(
       );
     }
 
-    if (userProblem.userId !== session.user.id) {
+    if (userProblem.userId !== user.id) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 403 }
@@ -47,11 +48,11 @@ export async function POST(
     // Ensure timeSpent is a number in seconds (handle edge cases)
     const timeSpentSeconds = typeof timeSpent === 'number' ? timeSpent : 0;
     const logStatus = status === 'solved' || status === 'attempted' ? status : (timeSpentSeconds > 0 ? "solved" : "attempted");
-    
+
     // Calculate expiration date (1 month from now)
     const expiresAt = new Date();
     expiresAt.setMonth(expiresAt.getMonth() + 1);
-    
+
     // Create a new Log entry
     const log = await prisma.log.create({
       data: {
@@ -67,12 +68,12 @@ export async function POST(
     // Fetch all logs, then filter non-expired ones
     const now = new Date();
     const allLogsForProblem = await prisma.log.findMany({
-      where: { 
+      where: {
         userProblemId: id
       },
       select: { timeSpent: true, createdAt: true, status: true, expiresAt: true }
     });
-    
+
     // Filter non-expired logs
     const nonExpiredLogs = allLogsForProblem.filter(log => {
       if (log.expiresAt) {
@@ -97,28 +98,28 @@ export async function POST(
         // If same time, sort by createdAt (latest first)
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
-    
+
     // Get the best timeSpent, and if there are multiple with same time, get the latest one
-    const latestBestTimeSpent = solvedNonExpiredLogs.length > 0 
-      ? solvedNonExpiredLogs[0].timeSpent 
+    const latestBestTimeSpent = solvedNonExpiredLogs.length > 0
+      ? solvedNonExpiredLogs[0].timeSpent
       : null;
-    
+
     // Get the latest log with status "solved" for solvedAt (including expired)
     const allLogs = await prisma.log.findMany({
       where: { userProblemId: id },
       select: { timeSpent: true, createdAt: true, status: true }
     });
-    
+
     const latestSolvedLog = allLogs
       .filter(log => log.status === "solved")
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
-    
+
     // Determine if this is the first solve
     const isFirstSolve = !userProblem.solvedAt && logStatus === "solved";
-    
+
     // Determine overall status - if any log is solved, the problem is solved
     const hasSolvedLog = allLogs.some(log => log.status === "solved");
-    
+
     // Update UserProblem with latest best non-expired timeSpent
     const updated = await prisma.userProblem.update({
       where: { id },
@@ -139,10 +140,10 @@ export async function POST(
       }
     });
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
       log: log,
-      userProblem: updated 
+      userProblem: updated
     });
   } catch (error: any) {
     return NextResponse.json(
@@ -163,9 +164,10 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session?.user?.id) {
+    if (!user) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -186,7 +188,7 @@ export async function DELETE(
       );
     }
 
-    if (userProblem.userId !== session.user.id) {
+    if (userProblem.userId !== user.id) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 403 }
