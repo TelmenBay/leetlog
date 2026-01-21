@@ -12,9 +12,8 @@ datasource db {
 }
 
 model User {
-  id            String        @id @default(cuid())
+  id            String        @id // UUID from Supabase auth.users
   email         String        @unique
-  password      String
   username      String?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
