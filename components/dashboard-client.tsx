@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import LogProblemModal from './log-problem-modal';
+import ConfirmModal, { shouldSkipConfirmation } from './confirm-modal';
 import { Log } from '@/lib/generated/prisma/client';
 
 interface UserProblem {
@@ -24,13 +25,90 @@ interface DashboardClientProps {
   userProblems: UserProblem[];
 }
 
-export default function DashboardClient({ userProblems }: DashboardClientProps) {
+export default function DashboardClient({ userProblems: initialUserProblems }: DashboardClientProps) {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [logModalOpen, setLogModalOpen] = useState(false);
   const [selectedProblem, setSelectedProblem] = useState<UserProblem | null>(null);
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [deleting, setDeleting] = useState(false);
+  const [userProblems, setUserProblems] = useState<UserProblem[]>(initialUserProblems);
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    dontAskAgainKey?: string;
+  }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
   const router = useRouter();
+
+  // Sync with server data
+  useEffect(() => {
+    setUserProblems(initialUserProblems);
+  }, [initialUserProblems]);
+
+  const toggleSelectMode = () => {
+    setSelectMode(!selectMode);
+    setSelectedIds(new Set());
+  };
+
+  const toggleSelection = (id: string) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const selectAll = () => {
+    if (selectedIds.size === userProblems.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(userProblems.map(up => up.id)));
+    }
+  };
+
+  const performDeleteProblems = async () => {
+    setDeleting(true);
+    setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: () => {} });
+    try {
+      const deletePromises = Array.from(selectedIds).map(id =>
+        fetch(`/api/user-problem/${id}`, { method: 'DELETE' })
+      );
+      await Promise.all(deletePromises);
+      // Update local state immediately
+      setUserProblems(prev => prev.filter(up => !selectedIds.has(up.id)));
+      setSelectedIds(new Set());
+      setSelectMode(false);
+      router.refresh();
+    } catch (err) {
+      setError('Failed to delete problems');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedIds.size === 0) return;
+
+    // Check if user wants to skip confirmation
+    if (shouldSkipConfirmation('deleteProblems')) {
+      performDeleteProblems();
+      return;
+    }
+
+    setConfirmModal({
+      isOpen: true,
+      title: 'Delete Problems',
+      message: `Are you sure you want to delete ${selectedIds.size} problem${selectedIds.size > 1 ? 's' : ''}? This will also delete all associated logs.`,
+      onConfirm: performDeleteProblems,
+      dontAskAgainKey: 'deleteProblems',
+    });
+  };
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
@@ -199,6 +277,32 @@ export default function DashboardClient({ userProblems }: DashboardClientProps) 
     }
   };
 
+  const handleDeleteLog = async (logId: string) => {
+    const response = await fetch(`/api/log/${logId}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete log');
+    }
+
+    // Update local state immediately
+    setUserProblems(prev => prev.map(up => ({
+      ...up,
+      logs: up.logs.filter(log => log.id !== logId)
+    })));
+
+    // Also update selectedProblem if it's open
+    if (selectedProblem) {
+      setSelectedProblem(prev => prev ? {
+        ...prev,
+        logs: prev.logs.filter(log => log.id !== logId)
+      } : null);
+    }
+
+    router.refresh();
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -269,13 +373,61 @@ export default function DashboardClient({ userProblems }: DashboardClientProps) 
           </div>
         )}
       </div>
+
+      {/* Select/Delete Controls */}
+      <div className="mb-3 flex items-center gap-3">
+        <button
+          onClick={toggleSelectMode}
+          className={`text-sm font-medium px-3 py-1.5 rounded-sm border transition-colors ${
+            selectMode
+              ? 'bg-[#1A1A1A] text-white border-[#1A1A1A]'
+              : 'bg-white text-[#6B6B6B] border-[#E5E5E5] hover:border-[#1A1A1A] hover:text-[#1A1A1A]'
+          }`}
+          style={{ fontFamily: 'var(--font-jost)' }}
+        >
+          {selectMode ? 'Cancel' : 'Select'}
+        </button>
+        {selectMode && (
+          <>
+            <button
+              onClick={selectAll}
+              className="text-sm font-medium px-3 py-1.5 rounded-sm border border-[#E5E5E5] bg-white text-[#6B6B6B] hover:border-[#1A1A1A] hover:text-[#1A1A1A] transition-colors"
+              style={{ fontFamily: 'var(--font-jost)' }}
+            >
+              {selectedIds.size === userProblems.length ? 'Deselect All' : 'Select All'}
+            </button>
+            <button
+              onClick={handleDeleteSelected}
+              disabled={selectedIds.size === 0 || deleting}
+              className="text-sm font-medium px-3 py-1.5 rounded-sm bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ fontFamily: 'var(--font-jost)' }}
+            >
+              {deleting ? 'Deleting...' : `Delete (${selectedIds.size})`}
+            </button>
+          </>
+        )}
+      </div>
       
       {/* Dashboard content - Spreadsheet style */}
       <div className="bg-white rounded-sm shadow-[0_1px_3px_rgba(0,0,0,0.08)] overflow-hidden">
         {/* Table Header */}
         <div
-          className="grid grid-cols-[50px_1fr_180px_100px_120px_120px_120px] gap-0 items-center bg-[#FAFAFA] border-b border-[#E5E5E5]"
+          className={`grid gap-0 items-center bg-[#FAFAFA] border-b border-[#E5E5E5] ${
+            selectMode
+              ? 'grid-cols-[40px_50px_1fr_180px_100px_120px_120px_120px]'
+              : 'grid-cols-[50px_1fr_180px_100px_120px_120px_120px]'
+          }`}
         >
+          {selectMode && (
+            <div className="px-3 py-3 border-r border-[#E5E5E5] flex items-center justify-center">
+              <input
+                type="checkbox"
+                checked={selectedIds.size === userProblems.length && userProblems.length > 0}
+                onChange={selectAll}
+                className="w-4 h-4 rounded border-[#D4D4D4] text-[#1A1A1A] focus:ring-[#1A1A1A]"
+              />
+            </div>
+          )}
           <div className="px-3 py-3 border-r border-[#E5E5E5]">
             <span className="text-[#6B6B6B] text-xs font-semibold uppercase tracking-wide" style={{ fontFamily: 'var(--font-jost)' }}>#</span>
           </div>
@@ -309,9 +461,30 @@ export default function DashboardClient({ userProblems }: DashboardClientProps) 
             {userProblems.map((userProblem, index) => (
               <div
                 key={userProblem.id}
-                onClick={() => handleLogClick(userProblem)}
-                className="grid grid-cols-[50px_1fr_180px_100px_120px_120px_120px] gap-0 items-center border-b border-[#E5E5E5] hover:bg-[#FAFAFA] transition-colors cursor-pointer"
+                onClick={() => {
+                  if (selectMode) {
+                    toggleSelection(userProblem.id);
+                  } else {
+                    handleLogClick(userProblem);
+                  }
+                }}
+                className={`grid gap-0 items-center border-b border-[#E5E5E5] hover:bg-[#FAFAFA] transition-colors cursor-pointer ${
+                  selectMode
+                    ? 'grid-cols-[40px_50px_1fr_180px_100px_120px_120px_120px]'
+                    : 'grid-cols-[50px_1fr_180px_100px_120px_120px_120px]'
+                } ${selectedIds.has(userProblem.id) ? 'bg-blue-50' : ''}`}
               >
+                {selectMode && (
+                  <div className="px-3 py-3 border-r border-[#E5E5E5] flex items-center justify-center">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(userProblem.id)}
+                      onChange={() => toggleSelection(userProblem.id)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-4 h-4 rounded border-[#D4D4D4] text-[#1A1A1A] focus:ring-[#1A1A1A]"
+                    />
+                  </div>
+                )}
                 <div className="px-3 py-3 border-r border-[#E5E5E5]">
                   <span className="text-[#6B6B6B] text-sm" style={{ fontFamily: 'var(--font-jost)' }}>
                     {userProblem.problem.leetcodeId || index + 1}
@@ -388,8 +561,20 @@ export default function DashboardClient({ userProblems }: DashboardClientProps) 
           problemTitle={selectedProblem.problem.title}
           logs={selectedProblem.logs}
           onSave={handleSaveLog}
+          onDeleteLog={handleDeleteLog}
         />
       )}
+
+      {/* Confirmation Modal */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: () => {} })}
+        onConfirm={confirmModal.onConfirm}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        showDontAskAgain={true}
+        dontAskAgainKey={confirmModal.dontAskAgainKey}
+      />
     </>
   );
 }
