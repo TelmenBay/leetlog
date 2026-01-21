@@ -9,7 +9,13 @@ export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+
+  // Debug: Check session
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+  console.log('Session check:', { hasSession: !!session, sessionError: sessionError?.message });
+
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  console.log('User check:', { hasUser: !!user, userId: user?.id, userError: userError?.message });
 
   if (!user) {
     redirect("/sign-in");
