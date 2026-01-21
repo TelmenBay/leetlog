@@ -18,22 +18,6 @@ export default async function DashboardPage() {
   const now = new Date();
 
   try {
-    // Ensure user exists in our database
-    let dbUser = await prisma.user.findUnique({
-      where: { id: user.id }
-    });
-
-    if (!dbUser) {
-      // Create user if they don't exist (OAuth users)
-      dbUser = await prisma.user.create({
-        data: {
-          id: user.id,
-          email: user.email!,
-          username: user.user_metadata?.username || user.user_metadata?.user_name || null,
-        }
-      });
-    }
-
     const userProblemsData = await prisma.userProblem.findMany({
       where: {
         userId: user.id

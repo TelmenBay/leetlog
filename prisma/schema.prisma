@@ -11,15 +11,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id            String        @id // UUID from Supabase auth.users
-  email         String        @unique
-  username      String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  userProblems  UserProblem[]
-}
-
 model Problem {
   id            String        @id @default(cuid())
   title         String
@@ -35,7 +26,7 @@ model Problem {
 
 model UserProblem {
   id            String        @id @default(cuid())
-  userId        String
+  userId        String        // UUID from Supabase auth.users
   problemId     String
   status        String        @default("not_started") // not_started, in_progress, solved
   timeSpent     Int?          // Time in seconds (best non-expired solve time, auto-updated from logs)
@@ -43,7 +34,6 @@ model UserProblem {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   problem       Problem       @relation(fields: [problemId], references: [id], onDelete: Cascade)
   logs          Log[]         // Relation to logs
 

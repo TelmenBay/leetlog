@@ -63,21 +63,6 @@ export default function SignUpPage() {
       }
 
       if (data.user) {
-        // Create user in our database
-        const response = await fetch("/api/auth/create-user", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            id: data.user.id,
-            email: data.user.email,
-            username,
-          }),
-        });
-
-        if (!response.ok) {
-          console.error("Failed to create user record in database");
-        }
-
         router.push("/dashboard");
         router.refresh();
       }

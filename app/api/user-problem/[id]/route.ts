@@ -27,8 +27,7 @@ export async function POST(
 
     // Verify the userProblem belongs to the current user
     const userProblem = await prisma.userProblem.findUnique({
-      where: { id },
-      include: { user: true }
+      where: { id }
     });
 
     if (!userProblem) {
