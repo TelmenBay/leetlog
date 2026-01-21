@@ -40,15 +40,43 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       GitHub({
         clientId: process.env.GITHUB_ID!,
         clientSecret: process.env.GITHUB_SECRET!,
-      })
+        authorization: {
+          params: {
+            scope: "read:user user:email",
+          },
+        },
+      }),
     ],
     callbacks: {
       async signIn({ user, account, profile }) {
         // Handle GitHub OAuth sign in - create or update user in database
         if (account?.provider === "github" && profile) {
-          const githubProfile = profile as { login?: string; email?: string }
-          const email = user.email || githubProfile.email
+          const githubProfile = profile as { login?: string; email?: string; id?: number }
+          let email = user.email || githubProfile.email
           const username = githubProfile.login
+
+          // If email is still not available, try to fetch it from GitHub API
+          if (!email && account.access_token) {
+            try {
+              const emailResponse = await fetch("https://api.github.com/user/emails", {
+                headers: {
+                  Authorization: `Bearer ${account.access_token}`,
+                  Accept: "application/vnd.github.v3+json",
+                },
+              })
+              
+              if (emailResponse.ok) {
+                const emails = await emailResponse.json() as Array<{ email: string; primary: boolean; verified: boolean }>
+                // Get primary email, or first verified email, or first email
+                const primaryEmail = emails.find(e => e.primary && e.verified) || 
+                                   emails.find(e => e.verified) || 
+                                   emails[0]
+                email = primaryEmail?.email
+              }
+            } catch (apiError) {
+              console.error("Error fetching email from GitHub API:", apiError)
+            }
+          }
 
           if (!email) {
             // Can't create user without email
@@ -83,7 +111,12 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
               user.id = newUser.id
             }
           } catch (error) {
-            console.error("Error during GitHub sign in:", error)
+            console.error("Error during GitHub sign in database operation:", error)
+            // Log more details about the error
+            if (error instanceof Error) {
+              console.error("Error message:", error.message)
+              console.error("Error stack:", error.stack)
+            }
             return false
           }
         }
