@@ -1,25 +1,42 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
 import Image from "next/image";
-import { signOut } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import DashboardClient from "@/components/dashboard-client";
+import SignOutButton from "@/components/sign-out-button";
 
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
-  const session = await auth();
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (!user) {
     redirect("/sign-in");
   }
 
   const now = new Date();
 
   try {
+    // Ensure user exists in our database
+    let dbUser = await prisma.user.findUnique({
+      where: { id: user.id }
+    });
+
+    if (!dbUser) {
+      // Create user if they don't exist (OAuth users)
+      dbUser = await prisma.user.create({
+        data: {
+          id: user.id,
+          email: user.email!,
+          username: user.user_metadata?.username || user.user_metadata?.user_name || null,
+        }
+      });
+    }
+
     const userProblemsData = await prisma.userProblem.findMany({
       where: {
-        userId: session.user?.id as string
+        userId: user.id
       },
       include: {
         problem: true,
@@ -71,19 +88,9 @@ export default async function DashboardPage() {
 
           <div className="flex items-center gap-4">
             <span className="text-[#6B6B6B] text-sm" style={{ fontFamily: 'var(--font-jost)' }}>
-              {session.user?.email || session.user?.name}
+              {user.email}
             </span>
-            <form action={async () => {
-              "use server";
-              await signOut({ redirectTo: "/" });
-            }}>
-              <button
-                type="submit"
-                className="text-sm font-medium border border-[#E5E5E5] px-4 py-2 text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white hover:border-[#1A1A1A] transition-colors rounded-sm"
-              >
-                Sign Out
-              </button>
-            </form>
+            <SignOutButton />
           </div>
         </header>
 
