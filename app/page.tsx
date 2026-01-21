@@ -24,10 +24,7 @@ export default async function Home() {
           />
         </div>
 
-        <div className="flex justify-center items-center">
-          <GitHubStar />
-        </div>
-
+        
         <div className="flex gap-3">
           <Link href="/sign-in">
             <button className="text-base font-medium px-5 py-2.5 border border-[#1A1A1A] text-[#1A1A1A] hover:bg-[#e3e3e3] hover:text-black transition-colors rounded-sm">
