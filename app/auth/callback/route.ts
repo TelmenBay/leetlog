@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
@@ -6,21 +7,39 @@ export async function GET(request: Request) {
   const code = searchParams.get('code')
   const next = searchParams.get('next') ?? '/dashboard'
 
-  console.log('OAuth callback:', { hasCode: !!code, origin, next })
-
   if (code) {
-    const supabase = await createClient()
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+    const cookieStore = await cookies()
 
-    console.log('Exchange result:', {
-      hasSession: !!data?.session,
-      hasUser: !!data?.user,
-      userId: data?.user?.id,
-      error: error?.message
-    })
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options)
+            })
+          },
+        },
+      }
+    )
+
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+      const forwardedHost = request.headers.get('x-forwarded-host')
+      const isLocalEnv = process.env.NODE_ENV === 'development'
+
+      if (isLocalEnv) {
+        return NextResponse.redirect(`${origin}${next}`)
+      } else if (forwardedHost) {
+        return NextResponse.redirect(`https://${forwardedHost}${next}`)
+      } else {
+        return NextResponse.redirect(`${origin}${next}`)
+      }
     }
   }
 

@@ -10,12 +10,7 @@ export const dynamic = 'force-dynamic';
 export default async function DashboardPage() {
   const supabase = await createClient();
 
-  // Debug: Check session
-  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-  console.log('Session check:', { hasSession: !!session, sessionError: sessionError?.message });
-
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  console.log('User check:', { hasUser: !!user, userId: user?.id, userError: userError?.message });
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect("/sign-in");
@@ -95,8 +90,7 @@ export default async function DashboardPage() {
         </main>
       </div>
     );
-  } catch (error) {
-    console.error('Error fetching dashboard data:', error);
+  } catch {
     return (
       <div className="flex flex-col min-h-screen items-center justify-center bg-[#F5F4F0]">
         <p className="text-[#1A1A1A]">Error loading dashboard. Please refresh the page.</p>
