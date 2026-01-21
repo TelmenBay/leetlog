@@ -146,7 +146,7 @@ export async function POST(
     });
   } catch (error: any) {
     return NextResponse.json(
-      { 
+      {
         error: "Internal server error"
       },
       { status: 500 }
@@ -154,3 +154,56 @@ export async function POST(
   }
 }
 
+/**
+ * DELETE /api/user-problem/[id]
+ * Deletes a UserProblem and all its associated logs
+ */
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await auth();
+
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const { id } = await params;
+
+    // Verify the userProblem belongs to the current user
+    const userProblem = await prisma.userProblem.findUnique({
+      where: { id }
+    });
+
+    if (!userProblem) {
+      return NextResponse.json(
+        { error: "Problem not found" },
+        { status: 404 }
+      );
+    }
+
+    if (userProblem.userId !== session.user.id) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 403 }
+      );
+    }
+
+    // Delete the userProblem (logs will cascade delete due to schema)
+    await prisma.userProblem.delete({
+      where: { id }
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error("Error deleting user problem:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
