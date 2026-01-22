@@ -54,7 +54,7 @@ export default function PrivacyPage() {
             <section className="space-y-3">
               <h2 className="text-xl font-semibold text-[#1A1A1A]">4. Third-Party Services</h2>
               <p className="text-[#6B6B6B] leading-relaxed">
-                We may use third-party services for authentication (such as GitHub OAuth) and analytics. These services have their own privacy policies governing the use of your information.
+                We may use third-party services for authentication (such as Google OAuth) and analytics. These services have their own privacy policies governing the use of your information.
               </p>
             </section>
 

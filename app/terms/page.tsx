@@ -2,8 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 
 export const metadata = {
-  title: "Terms & Conditions | LeetLog",
-  description: "Terms and Conditions for LeetLog - Your personal journal for mastering algorithms.",
+  title: "Terms of Service | LeetLog",
+  description: "Terms of Service for LeetLog - Your personal journal for mastering algorithms.",
 };
 
 export default function TermsPage() {
@@ -24,7 +24,7 @@ export default function TermsPage() {
       <main className="flex-1 px-8 py-12">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-3xl font-semibold text-[#1A1A1A] mb-8" style={{ fontFamily: 'var(--font-jost)' }}>
-            Terms & Conditions
+            Terms of Service
           </h1>
 
           <div className="prose prose-gray max-w-none space-y-6 text-[#1A1A1A]" style={{ fontFamily: 'var(--font-jost)' }}>
@@ -33,7 +33,7 @@ export default function TermsPage() {
             <section className="space-y-3">
               <h2 className="text-xl font-semibold text-[#1A1A1A]">1. Acceptance of Terms</h2>
               <p className="text-[#6B6B6B] leading-relaxed">
-                By accessing and using LeetLog, you accept and agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not use our service.
+                By accessing and using LeetLog, you accept and agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our service.
               </p>
             </section>
 
@@ -96,14 +96,14 @@ export default function TermsPage() {
             <section className="space-y-3">
               <h2 className="text-xl font-semibold text-[#1A1A1A]">10. Changes to Terms</h2>
               <p className="text-[#6B6B6B] leading-relaxed">
-                We may revise these Terms and Conditions at any time. By continuing to use LeetLog after changes become effective, you agree to be bound by the revised terms.
+                We may revise these Terms of Service at any time. By continuing to use LeetLog after changes become effective, you agree to be bound by the revised terms.
               </p>
             </section>
 
             <section className="space-y-3">
               <h2 className="text-xl font-semibold text-[#1A1A1A]">11. Contact</h2>
               <p className="text-[#6B6B6B] leading-relaxed">
-                If you have any questions about these Terms and Conditions, please contact us through our GitHub repository.
+                If you have any questions about these Terms of Service, please contact us through our GitHub repository.
               </p>
             </section>
           </div>
