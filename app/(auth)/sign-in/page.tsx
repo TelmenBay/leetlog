@@ -1,12 +1,10 @@
 'use client';
 
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
-import GithubSignIn from "@/components/github-oauth";
+import GoogleSignIn from "@/components/google-oauth";
 
 export default function SignInPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -20,18 +18,19 @@ export default function SignInPage() {
 
     try {
       const supabase = createClient();
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
         setError(error.message);
+      } else if (data.session) {
+        window.location.href = "/dashboard";
       } else {
-        router.push("/dashboard");
-        router.refresh();
+        setError("Sign in failed. Please try again.");
       }
-    } catch (err) {
+    } catch {
       setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
@@ -118,7 +117,7 @@ export default function SignInPage() {
           </div>
 
           <div className="flex justify-center">
-            <GithubSignIn />
+            <GoogleSignIn />
           </div>
         </div>
       </div>

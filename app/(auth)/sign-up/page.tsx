@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import GithubSignIn from "@/components/github-oauth";
+import GoogleSignIn from "@/components/google-oauth";
 
 function validatePassword(password: string): string | null {
   if (password.length < 8) {
@@ -171,7 +171,7 @@ export default function SignUpPage() {
           </div>
 
           <div className="flex justify-center">
-            <GithubSignIn />
+            <GoogleSignIn />
           </div>
         </div>
       </div>
