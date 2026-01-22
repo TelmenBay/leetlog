@@ -90,10 +90,13 @@ export default async function DashboardPage() {
         </main>
       </div>
     );
-  } catch {
+  } catch (error) {
+    console.error('Dashboard error:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return (
       <div className="flex flex-col min-h-screen items-center justify-center bg-[#F5F4F0]">
         <p className="text-[#1A1A1A]">Error loading dashboard. Please refresh the page.</p>
+        <p className="text-red-500 text-sm mt-2">{errorMessage}</p>
       </div>
     );
   }
