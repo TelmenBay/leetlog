@@ -15,6 +15,7 @@ interface UserProblem {
     id: string;
     leetcodeId: number | null;
     title: string;
+    slug: string | null;
     difficulty: string;
     tags: string[];
   };
@@ -414,8 +415,8 @@ export default function DashboardClient({ userProblems: initialUserProblems }: D
         <div
           className={`grid gap-0 items-center bg-[#FAFAFA] border-b border-[#E5E5E5] ${
             selectMode
-              ? 'grid-cols-[40px_50px_1fr_180px_100px_120px_120px_120px]'
-              : 'grid-cols-[50px_1fr_180px_100px_120px_120px_120px]'
+              ? 'grid-cols-[40px_50px_1fr_60px_180px_100px_120px_120px_120px]'
+              : 'grid-cols-[50px_1fr_60px_180px_100px_120px_120px_120px]'
           }`}
         >
           {selectMode && (
@@ -433,6 +434,9 @@ export default function DashboardClient({ userProblems: initialUserProblems }: D
           </div>
           <div className="px-3 py-3 border-r border-[#E5E5E5]">
             <span className="text-[#6B6B6B] text-xs font-semibold uppercase tracking-wide" style={{ fontFamily: 'var(--font-jost)' }}>Problem</span>
+          </div>
+          <div className="px-3 py-3 border-r border-[#E5E5E5]">
+            <span className="text-[#6B6B6B] text-xs font-semibold uppercase tracking-wide" style={{ fontFamily: 'var(--font-jost)' }}>Link</span>
           </div>
           <div className="px-3 py-3 border-r border-[#E5E5E5]">
             <span className="text-[#6B6B6B] text-xs font-semibold uppercase tracking-wide" style={{ fontFamily: 'var(--font-jost)' }}>Topics</span>
@@ -470,8 +474,8 @@ export default function DashboardClient({ userProblems: initialUserProblems }: D
                 }}
                 className={`grid gap-0 items-center border-b border-[#E5E5E5] hover:bg-[#FAFAFA] transition-colors cursor-pointer ${
                   selectMode
-                    ? 'grid-cols-[40px_50px_1fr_180px_100px_120px_120px_120px]'
-                    : 'grid-cols-[50px_1fr_180px_100px_120px_120px_120px]'
+                    ? 'grid-cols-[40px_50px_1fr_60px_180px_100px_120px_120px_120px]'
+                    : 'grid-cols-[50px_1fr_60px_180px_100px_120px_120px_120px]'
                 } ${selectedIds.has(userProblem.id) ? 'bg-blue-50' : ''}`}
               >
                 {selectMode && (
@@ -494,6 +498,24 @@ export default function DashboardClient({ userProblems: initialUserProblems }: D
                   <span className="text-[#1A1A1A] text-sm truncate block font-medium" style={{ fontFamily: 'var(--font-jost)' }}>
                     {userProblem.problem.title}
                   </span>
+                </div>
+                <div className="px-3 py-3 border-r border-[#E5E5E5] flex items-center justify-center">
+                  {userProblem.problem.slug ? (
+                    <a
+                      href={`https://leetcode.com/problems/${userProblem.problem.slug}/`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors"
+                      title="Open on LeetCode"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  ) : (
+                    <span className="text-[#9CA3AF]">-</span>
+                  )}
                 </div>
                 <div className="px-3 py-3 border-r border-[#E5E5E5]">
                   <div className="flex flex-wrap gap-1">

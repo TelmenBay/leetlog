@@ -1,6 +1,7 @@
 interface LeetCodeProblem {
     questionFrontendId: string;
     title: string;
+    titleSlug: string;
     difficulty: string;
     content: string;
     topicTags: Array<{ name: string; slug: string }>;
@@ -20,6 +21,7 @@ interface LeetCodeProblem {
         question(titleSlug: $titleSlug) {
           questionFrontendId
           title
+          titleSlug
           difficulty
           content
           topicTags {

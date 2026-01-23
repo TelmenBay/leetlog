@@ -58,6 +58,7 @@ export async function POST(request: NextRequest) {
         data: {
           leetcodeId,
           title: problemData.title,
+          slug: problemData.titleSlug,
           difficulty: problemData.difficulty,
           category: problemData.topicTags[0]?.name || null,
           tags: problemData.topicTags.map(tag => tag.name),

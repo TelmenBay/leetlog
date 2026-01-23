@@ -23,6 +23,7 @@ model User {
 model Problem {
   id            String        @id @default(cuid())
   title         String
+  slug          String?       // LeetCode URL slug (e.g., "two-sum")
   leetcodeId    Int?          @unique // LeetCode problem number
   difficulty    String        // Easy, Medium, Hard
   category      String?       // e.g., Array, String, Dynamic Programming
