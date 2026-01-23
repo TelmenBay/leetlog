@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Link from "next/link";
 import GoogleSignIn from "@/components/google-oauth";
 
 function validatePassword(password: string): string | null {
@@ -77,6 +78,16 @@ export default function SignUpPage() {
     <div className="min-h-screen flex items-center justify-center p-6 bg-[#F5F4F0]">
       <div className="w-full max-w-md">
         <div className="bg-white p-8 rounded-sm shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-sm text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors mb-4"
+            style={{ fontFamily: 'var(--font-jost)' }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+            </svg>
+            Back
+          </Link>
           <h1 className="text-2xl font-semibold text-[#1A1A1A] text-center mb-6" style={{ fontFamily: 'var(--font-jost)' }}>
             Sign Up
           </h1>
