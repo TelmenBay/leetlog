@@ -1,9 +1,14 @@
 import Link from "next/link";
 import Image from "next/image";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Terms of Service | LeetLog",
-  description: "Terms of Service for LeetLog - Your personal journal for mastering algorithms.",
+export const metadata: Metadata = {
+  title: "Terms of Service",
+  description: "Terms of Service for LeetLog - Your personal journal for mastering algorithms. Read our terms and conditions.",
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function TermsPage() {

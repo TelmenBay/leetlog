@@ -1,9 +1,14 @@
 import Link from "next/link";
 import Image from "next/image";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Privacy Policy | LeetLog",
-  description: "Privacy Policy for LeetLog - Your personal journal for mastering algorithms.",
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description: "Privacy Policy for LeetLog - Your personal journal for mastering algorithms. Learn how we collect, use, and protect your data.",
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function PrivacyPage() {
