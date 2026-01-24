@@ -1,6 +1,6 @@
 <svg width="2544" height="1160" viewBox="0 0 2544 1160" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g filter="url(#filter0_f_2018_11)">
-<rect x="500" y="500" width="1544" height="129" rx="40" fill="#8BFF83"/>
+<rect x="500" y="500" width="1544" height="129" rx="40" fill="white" fill-opacity="0.5"/>
 </g>
 <rect x="627.143" y="1100.19" width="1532" height="57" rx="8" transform="rotate(-4.2693 627.143 1100.19)" fill="url(#pattern0_2018_11)" stroke="#AAAAAA" stroke-width="4"/>
 <rect x="502" y="528" width="1540" height="64" rx="12" fill="url(#pattern1_2018_11)" stroke="#25D225" stroke-width="4"/>

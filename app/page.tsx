@@ -58,7 +58,7 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="flex flex-col min-h-screen bg-[#F5F4F0]">
+      <div className="flex flex-col min-h-screen bg-[#ffffff]">
         <header className="flex justify-between items-center px-4 sm:px-8 py-4 sm:py-6">
         <div className="flex items-center">
           <Image
@@ -92,7 +92,7 @@ export default async function Home() {
               alt="LeetLog Dashboard Preview"
               width={1200}
               height={800}
-              className="w-full max-w-10xl h-auto opacity-90"
+              className="w-full max-w-10xl h-auto opacity-100"
               priority
             />
           </div>
