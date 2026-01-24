@@ -31,8 +31,11 @@ LeetLog is an **open source** project. We believe in transparency and community-
 - **Progress Monitoring** - See your improvement over time
 - **Expiration System** - Problems "expire" after 30 days to encourage re-practice
 
-| ![Dashboard Screenshot](public/leetlog-dashboard1.png) | ![History Screenshot](public/leetlog-history.png) | ![Log Screenshot](public/leetlog-log.png) |
-
+<div style="display: flex; justify-content: space-around; align-items: center;">
+  <img src="public/leetlog-dashboard1.png" alt="Dashboard Screenshot" style="width: 30%; margin: 0 10px;">
+  <img src="public/leetlog-history.png" alt="History Screenshot" style="width: 30%; margin: 0 10px;">
+  <img src="public/leetlog-log.png" alt="Log Screenshot" style="width: 30%; margin: 0 10px;">
+</div>
 
 ## Tech Stack
 
