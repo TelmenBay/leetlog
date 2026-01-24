@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Jost } from "next/font/google";
+import { Analytics } from '@vercel/analytics/next';
 import "./globals.css";
 
 
@@ -92,6 +93,7 @@ export default function RootLayout({
         className={`${jost.variable} antialiased`}
       >
         {children}
+        <Analytics />
       </body>
     </html>
   );
