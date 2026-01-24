@@ -31,6 +31,9 @@ LeetLog is an **open source** project. We believe in transparency and community-
 - **Progress Monitoring** - See your improvement over time
 - **Expiration System** - Problems "expire" after 30 days to encourage re-practice
 
+| ![Dashboard Screenshot](public/leetlog-dashboard1.png) | ![History Screenshot](public/leetlog-history.png) | ![Log Screenshot](public/leetlog-log.png) |
+
+
 ## Tech Stack
 
 - **Framework**: Next.js 16
@@ -89,7 +92,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT
 
 ## Links
 
