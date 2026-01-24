@@ -23,6 +23,12 @@ export default function LogProblemModal({
 }: LogProblemModalProps) {
   const [time, setTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [accumulatedTime, setAccumulatedTime] = useState(0);
+  const [timerMode, setTimerMode] = useState<'timer' | 'manual'>('timer');
+  const [manualHours, setManualHours] = useState('0');
+  const [manualMinutes, setManualMinutes] = useState('0');
+  const [manualSeconds, setManualSeconds] = useState('0');
   const [notes, setNotes] = useState('');
   const [solution, setSolution] = useState('');
   const [status, setStatus] = useState<'solved' | 'attempted'>('solved');
@@ -34,6 +40,7 @@ export default function LogProblemModal({
     isOpen: boolean;
     logId: string | null;
   }>({ isOpen: false, logId: null });
+  const [originalTitle, setOriginalTitle] = useState('');
 
   const performDeleteLog = async (logId: string) => {
     if (!onDeleteLog) return;
@@ -66,29 +73,70 @@ export default function LogProblemModal({
     setConfirmModal({ isOpen: true, logId });
   };
 
-  // Timer logic
+  // Timer logic using timestamps (accurate even when tab is inactive)
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
+    let currentStartTime: number | null = null;
+
     if (isRunning) {
+      currentStartTime = Date.now();
+      setStartTime(currentStartTime);
+
       interval = setInterval(() => {
-        setTime((prevTime) => prevTime + 1);
-      }, 1000);
+        if (currentStartTime) {
+          const elapsed = Math.floor((Date.now() - currentStartTime) / 1000);
+          setTime(accumulatedTime + elapsed);
+        }
+      }, 100); // Update more frequently for smoother display
     }
+
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isRunning]);
+  }, [isRunning, accumulatedTime]);
+
+  // Update browser tab title with timer
+  useEffect(() => {
+    if (!isOpen) return;
+
+    if (!originalTitle) {
+      setOriginalTitle(document.title);
+    }
+
+    if (isRunning || time > 0) {
+      const h = Math.floor(time / 3600);
+      const m = Math.floor((time % 3600) / 60);
+      const s = time % 60;
+      const timeStr = h > 0
+        ? `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+        : `${m}:${s.toString().padStart(2, '0')}`;
+      document.title = `${isRunning ? '▶' : '❚❚'} ${timeStr} - ${problemTitle}`;
+    }
+
+    return () => {
+      if (originalTitle) {
+        document.title = originalTitle;
+      }
+    };
+  }, [isOpen, isRunning, time, problemTitle, originalTitle]);
 
   // Reset when modal opens
   useEffect(() => {
     if (isOpen) {
       setTime(0);
       setIsRunning(false);
+      setStartTime(null);
+      setAccumulatedTime(0);
+      setTimerMode('timer');
+      setManualHours('0');
+      setManualMinutes('0');
+      setManualSeconds('0');
       setNotes('');
       setSolution('');
       setStatus('solved');
       setActiveTab('new');
       setExpandedLogId(null);
+      setOriginalTitle(document.title);
     }
   }, [isOpen]);
 
@@ -129,16 +177,43 @@ export default function LogProblemModal({
   const handleReset = () => {
     setTime(0);
     setIsRunning(false);
+    setStartTime(null);
+    setAccumulatedTime(0);
+  };
+
+  const handleToggleTimer = () => {
+    if (isRunning) {
+      // Pausing - save accumulated time
+      setAccumulatedTime(time);
+      setIsRunning(false);
+    } else {
+      // Starting
+      setIsRunning(true);
+    }
+  };
+
+  // Calculate time from manual entry
+  const getManualTime = () => {
+    const h = parseInt(manualHours) || 0;
+    const m = parseInt(manualMinutes) || 0;
+    const s = parseInt(manualSeconds) || 0;
+    return h * 3600 + m * 60 + s;
+  };
+
+  // Get the effective time (either from timer or manual entry)
+  const getEffectiveTime = () => {
+    return timerMode === 'timer' ? time : getManualTime();
   };
 
   const handleSave = async () => {
-    if (time === 0 && !notes.trim() && !solution.trim()) {
+    const effectiveTime = getEffectiveTime();
+    if (effectiveTime === 0 && !notes.trim() && !solution.trim()) {
       return;
     }
 
     setLoading(true);
     try {
-      await onSave(time, notes, solution, status);
+      await onSave(effectiveTime, notes, solution, status);
       onClose();
     } catch (error) {
       // Error handling
@@ -220,59 +295,132 @@ export default function LogProblemModal({
                 <div className="flex flex-col gap-5 overflow-y-auto">
                   {/* Timer Section */}
                   <div>
-                    <label className="block text-[#1A1A1A] mb-3 text-sm font-semibold" style={{ fontFamily: 'var(--font-jost)' }}>
-                      Timer
-                    </label>
-
-                    {/* Timer Display */}
-                    <div className="flex items-center justify-center gap-2 mb-4">
-                      <div className="bg-white border border-[#E5E5E5] rounded-sm p-3 flex items-center justify-center min-w-16">
-                        <span className="text-3xl font-mono font-light text-[#1A1A1A] tracking-tight">
-                          {formatTimeDisplay(hours)}
-                        </span>
-                      </div>
-                      <span className="text-2xl text-[#6B6B6B] font-light">:</span>
-                      <div className="bg-white border border-[#E5E5E5] rounded-sm p-3 flex items-center justify-center min-w-16">
-                        <span className="text-3xl font-mono font-light text-[#1A1A1A] tracking-tight">
-                          {formatTimeDisplay(minutes)}
-                        </span>
-                      </div>
-                      <span className="text-2xl text-[#6B6B6B] font-light">:</span>
-                      <div className="bg-white border border-[#E5E5E5] rounded-sm p-3 flex items-center justify-center min-w-16">
-                        <span className="text-3xl font-mono font-light text-[#1A1A1A] tracking-tight">
-                          {formatTimeDisplay(seconds)}
-                        </span>
+                    <div className="flex items-center justify-between mb-3">
+                      <label className="text-[#1A1A1A] text-sm font-semibold" style={{ fontFamily: 'var(--font-jost)' }}>
+                        Time
+                      </label>
+                      {/* Mode Toggle */}
+                      <div className="flex bg-[#F5F4F0] rounded-sm p-0.5">
+                        <button
+                          onClick={() => setTimerMode('timer')}
+                          className={`px-3 py-1 text-xs font-medium rounded-sm transition-colors ${
+                            timerMode === 'timer'
+                              ? 'bg-white text-[#1A1A1A] shadow-sm'
+                              : 'text-[#6B6B6B] hover:text-[#1A1A1A]'
+                          }`}
+                          style={{ fontFamily: 'var(--font-jost)' }}
+                        >
+                          Timer
+                        </button>
+                        <button
+                          onClick={() => {
+                            setTimerMode('manual');
+                            setIsRunning(false);
+                          }}
+                          className={`px-3 py-1 text-xs font-medium rounded-sm transition-colors ${
+                            timerMode === 'manual'
+                              ? 'bg-white text-[#1A1A1A] shadow-sm'
+                              : 'text-[#6B6B6B] hover:text-[#1A1A1A]'
+                          }`}
+                          style={{ fontFamily: 'var(--font-jost)' }}
+                        >
+                          Manual
+                        </button>
                       </div>
                     </div>
 
-                    {/* Timer Controls */}
-                    <div className="flex justify-center gap-3">
-                      <button
-                        onClick={() => setIsRunning(!isRunning)}
-                        className="px-4 py-2 bg-[#1A1A1A] text-white hover:bg-[#333] transition-colors font-medium rounded-sm flex items-center gap-2 text-sm"
-                        style={{ fontFamily: 'var(--font-jost)' }}
-                      >
-                        {isRunning ? (
-                          <>
-                            <img src="/pause.svg" alt="Pause" className="w-4 h-4 invert" />
-                            <span>Pause</span>
-                          </>
-                        ) : (
-                          <>
-                            <img src="/play.svg" alt="Play" className="w-4 h-4 invert" />
-                            <span>Start</span>
-                          </>
-                        )}
-                      </button>
-                      <button
-                        onClick={handleReset}
-                        className="px-4 py-2 border border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F4F0] transition-colors rounded-sm flex items-center gap-2 text-sm"
-                        style={{ fontFamily: 'var(--font-jost)' }}
-                      >
-                        <img src="/reset-left-fill.svg" alt="Reset" className="w-4 h-4" />
-                        <span>Reset</span>
-                      </button>
-                    </div>
+                    {timerMode === 'timer' ? (
+                      <>
+                        {/* Timer Display */}
+                        <div className="flex items-center justify-center gap-2 mb-4">
+                          <div className="bg-white border border-[#E5E5E5] rounded-sm p-3 flex items-center justify-center min-w-16">
+                            <span className="text-3xl font-mono font-light text-[#1A1A1A] tracking-tight">
+                              {formatTimeDisplay(hours)}
+                            </span>
+                          </div>
+                          <span className="text-2xl text-[#6B6B6B] font-light">:</span>
+                          <div className="bg-white border border-[#E5E5E5] rounded-sm p-3 flex items-center justify-center min-w-16">
+                            <span className="text-3xl font-mono font-light text-[#1A1A1A] tracking-tight">
+                              {formatTimeDisplay(minutes)}
+                            </span>
+                          </div>
+                          <span className="text-2xl text-[#6B6B6B] font-light">:</span>
+                          <div className="bg-white border border-[#E5E5E5] rounded-sm p-3 flex items-center justify-center min-w-16">
+                            <span className="text-3xl font-mono font-light text-[#1A1A1A] tracking-tight">
+                              {formatTimeDisplay(seconds)}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Timer Controls */}
+                        <div className="flex justify-center gap-3">
+                          <button
+                            onClick={handleToggleTimer}
+                            className="px-4 py-2 bg-[#1A1A1A] text-white hover:bg-[#333] transition-colors font-medium rounded-sm flex items-center gap-2 text-sm"
+                            style={{ fontFamily: 'var(--font-jost)' }}
+                          >
+                            {isRunning ? (
+                              <>
+                                <img src="/pause.svg" alt="Pause" className="w-4 h-4 invert" />
+                                <span>Pause</span>
+                              </>
+                            ) : (
+                              <>
+                                <img src="/play.svg" alt="Play" className="w-4 h-4 invert" />
+                                <span>Start</span>
+                              </>
+                            )}
+                          </button>
+                          <button
+                            onClick={handleReset}
+                            className="px-4 py-2 border border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F4F0] transition-colors rounded-sm flex items-center gap-2 text-sm"
+                            style={{ fontFamily: 'var(--font-jost)' }}
+                          >
+                            <img src="/reset-left-fill.svg" alt="Reset" className="w-4 h-4" />
+                            <span>Reset</span>
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      /* Manual Entry */
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="flex flex-col items-center">
+                          <input
+                            type="number"
+                            min="0"
+                            max="23"
+                            value={manualHours}
+                            onChange={(e) => setManualHours(e.target.value)}
+                            className="w-16 bg-white border border-[#E5E5E5] rounded-sm p-3 text-3xl font-mono font-light text-[#1A1A1A] tracking-tight text-center focus:outline-none focus:border-[#1A1A1A]"
+                          />
+                          <span className="text-xs text-[#6B6B6B] mt-1" style={{ fontFamily: 'var(--font-jost)' }}>hours</span>
+                        </div>
+                        <span className="text-2xl text-[#6B6B6B] font-light mb-5">:</span>
+                        <div className="flex flex-col items-center">
+                          <input
+                            type="number"
+                            min="0"
+                            max="59"
+                            value={manualMinutes}
+                            onChange={(e) => setManualMinutes(e.target.value)}
+                            className="w-16 bg-white border border-[#E5E5E5] rounded-sm p-3 text-3xl font-mono font-light text-[#1A1A1A] tracking-tight text-center focus:outline-none focus:border-[#1A1A1A]"
+                          />
+                          <span className="text-xs text-[#6B6B6B] mt-1" style={{ fontFamily: 'var(--font-jost)' }}>mins</span>
+                        </div>
+                        <span className="text-2xl text-[#6B6B6B] font-light mb-5">:</span>
+                        <div className="flex flex-col items-center">
+                          <input
+                            type="number"
+                            min="0"
+                            max="59"
+                            value={manualSeconds}
+                            onChange={(e) => setManualSeconds(e.target.value)}
+                            className="w-16 bg-white border border-[#E5E5E5] rounded-sm p-3 text-3xl font-mono font-light text-[#1A1A1A] tracking-tight text-center focus:outline-none focus:border-[#1A1A1A]"
+                          />
+                          <span className="text-xs text-[#6B6B6B] mt-1" style={{ fontFamily: 'var(--font-jost)' }}>secs</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Status Selection */}
@@ -495,7 +643,7 @@ export default function LogProblemModal({
             </button>
             <button
               onClick={handleSave}
-              disabled={loading || (time === 0 && !notes.trim() && !solution.trim())}
+              disabled={loading || (getEffectiveTime() === 0 && !notes.trim() && !solution.trim())}
               className="px-5 py-2.5 bg-[#1A1A1A] text-white font-medium hover:bg-[#333] rounded-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               style={{ fontFamily: 'var(--font-jost)' }}
             >
