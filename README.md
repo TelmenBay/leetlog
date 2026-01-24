@@ -21,7 +21,7 @@
 
 ## Open Source
 
-LeetLog is **100% open source** and free to use. We believe in transparency and community-driven development. Feel free to contribute, fork, or self-host!
+LeetLog is an **open source** project. We believe in transparency and community-driven development. Feel free to contribute, fork, or self-host!
 
 ## Features
 
@@ -33,7 +33,7 @@ LeetLog is **100% open source** and free to use. We believe in transparency and 
 
 ## Tech Stack
 
-- **Framework**: Next.js 14 (App Router)
+- **Framework**: Next.js 16
 - **Database**: PostgreSQL with Prisma ORM
 - **Authentication**: Supabase Auth
 - **Styling**: Tailwind CSS
@@ -93,5 +93,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Links
 
-- [Live Demo](https://www.leetlog.net)
-- [GitHub Repository](https://github.com/telmenbayar/leetlog)
+- [leetlog.net](https://www.leetlog.net)
