@@ -118,7 +118,7 @@ export default async function Home() {
             </p>
             <div className="flex gap-4 sm:gap-6 items-center">
               <a
-                href="https://github.com/telmenbayar/leetlog"
+                href="https://github.com/TelmenBay/leetlog"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors"
