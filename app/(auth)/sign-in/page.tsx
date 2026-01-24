@@ -130,6 +130,13 @@ export default function SignInPage() {
           <div className="flex justify-center">
             <GoogleSignIn />
           </div>
+
+          <p className="mt-6 text-center text-sm text-[#6B6B6B]" style={{ fontFamily: 'var(--font-jost)' }}>
+            Don&apos;t have an account?{' '}
+            <Link href="/sign-up" className="text-[#1A1A1A] font-medium hover:underline">
+              Sign up
+            </Link>
+          </p>
         </div>
       </div>
     </div>

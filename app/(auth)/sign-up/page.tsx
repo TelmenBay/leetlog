@@ -1,8 +1,8 @@
 'use client';
 
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import GoogleSignIn from "@/components/google-oauth";
 
@@ -22,14 +22,23 @@ function validatePassword(password: string): string | null {
   return null;
 }
 
-export default function SignUpPage() {
+function SignUpForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [username, setUsername] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pendingUrl, setPendingUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const url = searchParams.get('url');
+    if (url) {
+      setPendingUrl(url);
+    }
+  }, [searchParams]);
 
   const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,6 +51,12 @@ export default function SignUpPage() {
       return;
     }
 
+    // Check passwords match
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -51,11 +66,6 @@ export default function SignUpPage() {
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          data: {
-            username: username,
-          },
-        },
       });
 
       if (signUpError) {
@@ -64,7 +74,11 @@ export default function SignUpPage() {
       }
 
       if (data.user) {
-        router.push("/dashboard");
+        // If there's a pending URL, redirect to dashboard with it
+        const redirectUrl = pendingUrl
+          ? `/dashboard?addUrl=${encodeURIComponent(pendingUrl)}`
+          : "/dashboard";
+        router.push(redirectUrl);
         router.refresh();
       }
     } catch (err) {
@@ -93,21 +107,6 @@ export default function SignUpPage() {
           </h1>
 
           <form onSubmit={handleCredentialsSubmit} className="space-y-4 mb-6">
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
-                Username
-              </label>
-              <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                className="w-full px-3 py-2.5 bg-[#FAFAFA] border border-[#E5E5E5] rounded-sm text-[#1A1A1A] placeholder-[#9CA3AF] focus:outline-none focus:border-[#1A1A1A] transition-colors"
-                placeholder="johndoe"
-              />
-            </div>
-
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
                 Email
@@ -159,6 +158,21 @@ export default function SignUpPage() {
               </p>
             </div>
 
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
+                Confirm Password
+              </label>
+              <input
+                id="confirmPassword"
+                type={showPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                className="w-full px-3 py-2.5 bg-[#FAFAFA] border border-[#E5E5E5] rounded-sm text-[#1A1A1A] placeholder-[#9CA3AF] focus:outline-none focus:border-[#1A1A1A] transition-colors"
+                placeholder="••••••••"
+              />
+            </div>
+
             {error && (
               <div className="text-red-500 text-sm text-center">{error}</div>
             )}
@@ -184,8 +198,27 @@ export default function SignUpPage() {
           <div className="flex justify-center">
             <GoogleSignIn />
           </div>
+
+          <p className="mt-6 text-center text-sm text-[#6B6B6B]" style={{ fontFamily: 'var(--font-jost)' }}>
+            Already have an account?{' '}
+            <Link href="/sign-in" className="text-[#1A1A1A] font-medium hover:underline">
+              Sign in
+            </Link>
+          </p>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-[#F5F4F0]">
+        <div className="text-[#6B6B6B]">Loading...</div>
+      </div>
+    }>
+      <SignUpForm />
+    </Suspense>
   );
 }
