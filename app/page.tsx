@@ -84,21 +84,9 @@ export default async function Home() {
           </div>
         </header>
 
-        <main className="flex-1 relative overflow-hidden">
-          {/* Background Image - hidden on mobile */}
-          <div className="hidden sm:flex absolute inset-0 items-end justify-center pointer-events-none">
-            <Image
-              src="/landingcomp.svg"
-              alt="LeetLog Dashboard Preview"
-              width={1200}
-              height={800}
-              className="w-full max-w-10xl h-auto opacity-100"
-              priority
-            />
-          </div>
-
+        <main className="flex-1 overflow-hidden">
           {/* Text Content */}
-          <div className="relative z-10 flex flex-col items-center px-4 sm:px-6 pt-12 sm:pt-20">
+          <div className="flex flex-col items-center px-4 sm:px-6 pt-12 sm:pt-20">
             <div className="max-w-4xl text-center px-2">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[#1A1A1A] font-medium leading-tight mb-4" style={{ fontFamily: 'var(--font-jost)' }}>
                 Track your progress. Build your confidence.
@@ -108,6 +96,18 @@ export default async function Home() {
               </p>
               <LandingSearch />
             </div>
+          </div>
+
+          {/* Dashboard Preview Image */}
+          <div className="hidden sm:flex justify-center -mt-30">
+            <Image
+              src="/landingcomp.svg"
+              alt="LeetLog Dashboard Preview"
+              width={1920}
+              height={1080}
+              className="w-full h-auto"
+              priority
+            />
           </div>
         </main>
 
