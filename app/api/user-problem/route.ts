@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { fetchLeetCodeProblem } from "@/lib/leetcode";
+import { fetchLeetCodeProblem, extractProblemSlug } from "@/lib/leetcode";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
@@ -19,18 +19,10 @@ export async function POST(request: NextRequest) {
 
     const { url } = await request.json();
 
-    if (!url || !url.includes('leetcode.com/problems/')) {
+    const slug = extractProblemSlug(url);
+    if (!url || !slug) {
       return NextResponse.json(
-        { error: "Invalid LeetCode URL" },
-        { status: 400 }
-      );
-    }
-
-    // Extract slug to get leetcodeId
-    const match = url.match(/leetcode\.com\/problems\/([^\/]+)/);
-    if (!match) {
-      return NextResponse.json(
-        { error: "Invalid LeetCode URL format" },
+        { error: "Invalid LeetCode or NeetCode URL" },
         { status: 400 }
       );
     }

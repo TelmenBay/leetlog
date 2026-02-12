@@ -345,14 +345,14 @@ export default function DashboardClient({ userProblems: initialUserProblems }: D
               className="block text-[#1A1A1A] mb-1.5 text-sm font-medium"
               style={{ fontFamily: 'var(--font-jost)' }}
             >
-              LeetCode Problem URL
+              Problem URL
             </label>
             <input
               type="url"
               id="url"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://leetcode.com/problems/two-sum/"
+              placeholder="Paste a LeetCode or NeetCode URL..."
               className="w-full px-3 py-2.5 bg-white border border-[#E5E5E5] rounded-sm text-[#1A1A1A] placeholder-[#9CA3AF] focus:outline-none focus:border-[#1A1A1A] transition-colors"
               style={{ fontFamily: 'var(--font-jost)' }}
               required

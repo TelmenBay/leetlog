@@ -8,13 +8,16 @@ interface LeetCodeProblem {
     isPaidOnly: boolean;
   }
   
+  export function extractProblemSlug(url: string): string | null {
+    const match = url.match(/(?:leetcode\.com|neetcode\.io)\/problems\/([^\/\?]+)/);
+    return match ? match[1] : null;
+  }
+
   export async function fetchLeetCodeProblem(url: string): Promise<LeetCodeProblem | null> {
-    const match = url.match(/leetcode\.com\/problems\/([^\/]+)/);
-    if (!match) {
-      throw new Error("Invalid LeetCode URL");
+    const titleSlug = extractProblemSlug(url);
+    if (!titleSlug) {
+      throw new Error("Invalid LeetCode or NeetCode URL");
     }
-    
-    const titleSlug = match[1];
     
     const query = `
       query getQuestionDetail($titleSlug: String!) {

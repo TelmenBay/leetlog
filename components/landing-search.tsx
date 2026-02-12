@@ -21,7 +21,7 @@ export default function LandingSearch() {
           type="text"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          placeholder="Paste a LeetCode problem URL..."
+          placeholder="Paste a LeetCode or NeetCode URL..."
           className="flex-1 px-4 py-3 bg-white border-[#9e9e9e] border-3 rounded-lg text-[#1A1A1A] placeholder-[#9CA3AF] focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] transition-colors"
           style={{ fontFamily: 'var(--font-jost)' }}
         />
