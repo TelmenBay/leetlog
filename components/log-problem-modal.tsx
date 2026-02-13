@@ -386,36 +386,48 @@ export default function LogProblemModal({
                       <div className="flex items-center justify-center gap-2">
                         <div className="flex flex-col items-center">
                           <input
-                            type="number"
-                            min="0"
-                            max="23"
+                            type="text"
+                            inputMode="numeric"
                             value={manualHours}
-                            onChange={(e) => setManualHours(e.target.value)}
-                            className="w-16 bg-white border border-[#E5E5E5] rounded-sm p-3 text-3xl font-mono font-light text-[#1A1A1A] tracking-tight text-center focus:outline-none focus:border-[#1A1A1A]"
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => {
+                              const raw = e.target.value.replace(/\D/g, '');
+                              const num = Math.min(parseInt(raw) || 0, 23);
+                              setManualHours(raw === '' ? '0' : String(num));
+                            }}
+                            className="w-16 bg-white border border-[#E5E5E5] rounded-sm p-3 text-3xl font-mono font-light text-[#1A1A1A] tracking-tight text-center focus:outline-none focus:border-[#1A1A1A] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           />
                           <span className="text-xs text-[#6B6B6B] mt-1" style={{ fontFamily: 'var(--font-jost)' }}>hours</span>
                         </div>
                         <span className="text-2xl text-[#6B6B6B] font-light mb-5">:</span>
                         <div className="flex flex-col items-center">
                           <input
-                            type="number"
-                            min="0"
-                            max="59"
+                            type="text"
+                            inputMode="numeric"
                             value={manualMinutes}
-                            onChange={(e) => setManualMinutes(e.target.value)}
-                            className="w-16 bg-white border border-[#E5E5E5] rounded-sm p-3 text-3xl font-mono font-light text-[#1A1A1A] tracking-tight text-center focus:outline-none focus:border-[#1A1A1A]"
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => {
+                              const raw = e.target.value.replace(/\D/g, '');
+                              const num = Math.min(parseInt(raw) || 0, 59);
+                              setManualMinutes(raw === '' ? '0' : String(num));
+                            }}
+                            className="w-16 bg-white border border-[#E5E5E5] rounded-sm p-3 text-3xl font-mono font-light text-[#1A1A1A] tracking-tight text-center focus:outline-none focus:border-[#1A1A1A] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           />
                           <span className="text-xs text-[#6B6B6B] mt-1" style={{ fontFamily: 'var(--font-jost)' }}>mins</span>
                         </div>
                         <span className="text-2xl text-[#6B6B6B] font-light mb-5">:</span>
                         <div className="flex flex-col items-center">
                           <input
-                            type="number"
-                            min="0"
-                            max="59"
+                            type="text"
+                            inputMode="numeric"
                             value={manualSeconds}
-                            onChange={(e) => setManualSeconds(e.target.value)}
-                            className="w-16 bg-white border border-[#E5E5E5] rounded-sm p-3 text-3xl font-mono font-light text-[#1A1A1A] tracking-tight text-center focus:outline-none focus:border-[#1A1A1A]"
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => {
+                              const raw = e.target.value.replace(/\D/g, '');
+                              const num = Math.min(parseInt(raw) || 0, 59);
+                              setManualSeconds(raw === '' ? '0' : String(num));
+                            }}
+                            className="w-16 bg-white border border-[#E5E5E5] rounded-sm p-3 text-3xl font-mono font-light text-[#1A1A1A] tracking-tight text-center focus:outline-none focus:border-[#1A1A1A] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           />
                           <span className="text-xs text-[#6B6B6B] mt-1" style={{ fontFamily: 'var(--font-jost)' }}>secs</span>
                         </div>
