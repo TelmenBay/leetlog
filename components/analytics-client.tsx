@@ -23,15 +23,6 @@ interface AnalyticsClientProps {
   userProblems: UserProblemWithDetails[];
 }
 
-interface TagStats {
-  tag: string;
-  total: number;
-  solved: number;
-  totalTime: number;
-  solvedWithTime: number;
-  readiness: Record<Readiness, number>;
-}
-
 // --- Category definitions with LeetCode tag mappings ---
 
 interface Category {
@@ -118,35 +109,7 @@ export default function AnalyticsClient({ userProblems }: AnalyticsClientProps) 
       };
     });
 
-    // Tag breakdown (raw LeetCode tags for the table)
-    const tagMap = new Map<string, TagStats>();
-    userProblems.forEach(up => {
-      const readiness = calculateReadiness(up);
-      up.problem.tags.forEach(tag => {
-        if (!tagMap.has(tag)) {
-          tagMap.set(tag, {
-            tag,
-            total: 0,
-            solved: 0,
-            totalTime: 0,
-            solvedWithTime: 0,
-            readiness: { mastered: 0, revisit: 0, weak: 0, rusty: 0, '-': 0 },
-          });
-        }
-        const s = tagMap.get(tag)!;
-        s.total++;
-        if (up.timeSpent !== null) {
-          s.solved++;
-          s.totalTime += up.timeSpent;
-          s.solvedWithTime++;
-        }
-        s.readiness[readiness]++;
-      });
-    });
-
-    const tagStats = Array.from(tagMap.values()).sort((a, b) => b.total - a.total);
-
-    return { totalProblems, solved, avgTime, readinessCounts, difficultyStats, tagStats };
+    return { totalProblems, solved, avgTime, readinessCounts, difficultyStats };
   }, [userProblems]);
 
   // Compute category scores for radar charts
@@ -405,70 +368,6 @@ export default function AnalyticsClient({ userProblems }: AnalyticsClientProps) 
         ))}
       </div>
 
-      {/* Tag Breakdown Table */}
-      <div className="bg-white rounded-sm shadow-[0_1px_3px_rgba(0,0,0,0.08)] overflow-hidden">
-        <div className="grid grid-cols-[1fr_80px_80px_100px_1fr] gap-0 items-center bg-[#FAFAFA] border-b border-[#E5E5E5]">
-          <div className="px-3 py-3 border-r border-[#E5E5E5]">
-            <span className="text-[#6B6B6B] text-xs font-semibold uppercase tracking-wide" style={{ fontFamily: 'var(--font-jost)' }}>Tag</span>
-          </div>
-          <div className="px-3 py-3 border-r border-[#E5E5E5]">
-            <span className="text-[#6B6B6B] text-xs font-semibold uppercase tracking-wide" style={{ fontFamily: 'var(--font-jost)' }}>Problems</span>
-          </div>
-          <div className="px-3 py-3 border-r border-[#E5E5E5]">
-            <span className="text-[#6B6B6B] text-xs font-semibold uppercase tracking-wide" style={{ fontFamily: 'var(--font-jost)' }}>Solved</span>
-          </div>
-          <div className="px-3 py-3 border-r border-[#E5E5E5]">
-            <span className="text-[#6B6B6B] text-xs font-semibold uppercase tracking-wide" style={{ fontFamily: 'var(--font-jost)' }}>Avg Time</span>
-          </div>
-          <div className="px-3 py-3">
-            <span className="text-[#6B6B6B] text-xs font-semibold uppercase tracking-wide" style={{ fontFamily: 'var(--font-jost)' }}>Readiness</span>
-          </div>
-        </div>
-
-        {stats.tagStats.map(t => (
-          <div key={t.tag} className="grid grid-cols-[1fr_80px_80px_100px_1fr] gap-0 items-center border-b border-[#E5E5E5] hover:bg-[#FAFAFA] transition-colors">
-            <div className="px-3 py-3 border-r border-[#E5E5E5]">
-              <span className="text-[#1A1A1A] text-sm font-medium" style={{ fontFamily: 'var(--font-jost)' }}>
-                {t.tag}
-              </span>
-            </div>
-            <div className="px-3 py-3 border-r border-[#E5E5E5]">
-              <span className="text-[#1A1A1A] text-sm" style={{ fontFamily: 'var(--font-jost)' }}>
-                {t.total}
-              </span>
-            </div>
-            <div className="px-3 py-3 border-r border-[#E5E5E5]">
-              <span className="text-[#1A1A1A] text-sm" style={{ fontFamily: 'var(--font-jost)' }}>
-                {t.solved}
-              </span>
-            </div>
-            <div className="px-3 py-3 border-r border-[#E5E5E5]">
-              <span className="text-[#1A1A1A] text-sm" style={{ fontFamily: 'var(--font-jost)' }}>
-                {t.solvedWithTime > 0 ? formatTime(Math.round(t.totalTime / t.solvedWithTime)) : '-'}
-              </span>
-            </div>
-            <div className="px-3 py-3">
-              <div className="flex gap-1.5 flex-wrap">
-                {(['mastered', 'revisit', 'rusty', 'weak'] as Readiness[])
-                  .filter(key => t.readiness[key] > 0)
-                  .map(key => (
-                    <span
-                      key={key}
-                      className={`text-[10px] font-medium px-1.5 py-0.5 rounded-sm border capitalize ${getReadinessBadgeClasses(key)}`}
-                      style={{ fontFamily: 'var(--font-jost)' }}
-                    >
-                      {key} {t.readiness[key]}
-                    </span>
-                  ))
-                }
-                {t.readiness.mastered === 0 && t.readiness.revisit === 0 && t.readiness.weak === 0 && t.readiness.rusty === 0 && (
-                  <span className="text-[#9CA3AF] text-sm">-</span>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
