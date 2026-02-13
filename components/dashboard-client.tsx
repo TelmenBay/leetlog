@@ -4,38 +4,22 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import LogProblemModal from './log-problem-modal';
 import ConfirmModal, { shouldSkipConfirmation } from './confirm-modal';
-import { Log } from '@/lib/generated/prisma/client';
-
-interface UserProblem {
-  id: string;
-  status: string;
-  timeSpent: number | null;
-  solvedAt: Date | null;
-  problem: {
-    id: string;
-    leetcodeId: number | null;
-    title: string;
-    slug: string | null;
-    difficulty: string;
-    tags: string[];
-  };
-  logs: Log[];
-}
+import { UserProblemWithDetails, calculateReadiness, getReadinessBadgeClasses, formatTime } from '@/lib/readiness';
 
 interface DashboardClientProps {
-  userProblems: UserProblem[];
+  userProblems: UserProblemWithDetails[];
 }
 
-export default function DashboardClient({ userProblems: initialUserProblems }: DashboardClientProps) {
+export default function DashboardClient({ userProblems: initialUserProblemWithDetailss }: DashboardClientProps) {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [logModalOpen, setLogModalOpen] = useState(false);
-  const [selectedProblem, setSelectedProblem] = useState<UserProblem | null>(null);
+  const [selectedProblem, setSelectedProblem] = useState<UserProblemWithDetails | null>(null);
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState(false);
-  const [userProblems, setUserProblems] = useState<UserProblem[]>(initialUserProblems);
+  const [userProblems, setUserProblemWithDetailss] = useState<UserProblemWithDetails[]>(initialUserProblemWithDetailss);
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
     title: string;
@@ -47,8 +31,8 @@ export default function DashboardClient({ userProblems: initialUserProblems }: D
 
   // Sync with server data
   useEffect(() => {
-    setUserProblems(initialUserProblems);
-  }, [initialUserProblems]);
+    setUserProblemWithDetailss(initialUserProblemWithDetailss);
+  }, [initialUserProblemWithDetailss]);
 
   const toggleSelectMode = () => {
     setSelectMode(!selectMode);
@@ -82,7 +66,7 @@ export default function DashboardClient({ userProblems: initialUserProblems }: D
       );
       await Promise.all(deletePromises);
       // Update local state immediately
-      setUserProblems(prev => prev.filter(up => !selectedIds.has(up.id)));
+      setUserProblemWithDetailss(prev => prev.filter(up => !selectedIds.has(up.id)));
       setSelectedIds(new Set());
       setSelectMode(false);
       router.refresh();
@@ -124,21 +108,6 @@ export default function DashboardClient({ userProblems: initialUserProblems }: D
     }
   };
 
-  const formatTime = (seconds: number | null) => {
-    if (!seconds) return '-';
-    const hours = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-
-    if (hours > 0) {
-      return mins > 0 ? `${hours}h ${mins}m ${secs}s` : `${hours}h ${secs}s`;
-    }
-    if (mins > 0) {
-      return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
-    }
-    return `${secs}s`;
-  };
-
   const formatDate = (date: Date | null) => {
     if (!date) return '-';
     return new Date(date).toLocaleDateString('en-US', {
@@ -148,110 +117,7 @@ export default function DashboardClient({ userProblems: initialUserProblems }: D
     });
   };
 
-  const calculateReadiness = (userProblem: UserProblem): string => {
-    const { timeSpent, solvedAt, problem, logs } = userProblem;
-    
-    // If not solved yet, return empty
-    if (!timeSpent || !solvedAt) return '-';
-    
-    // Get the latest non-expired log
-    const now = new Date();
-    const nonExpiredLogs = logs?.filter(log => {
-      // Check if expiresAt exists and if it's in the future
-      if ('expiresAt' in log && log.expiresAt) {
-        const expiresAt = new Date(log.expiresAt as Date);
-        return expiresAt > now;
-      }
-      // If expiresAt doesn't exist (old logs created before migration), 
-      // calculate expiration: createdAt + 30 days
-      if (log.createdAt) {
-        const createdAt = new Date(log.createdAt);
-        const calculatedExpiresAt = new Date(createdAt);
-        calculatedExpiresAt.setDate(calculatedExpiresAt.getDate() + 30);
-        return calculatedExpiresAt > now;
-      }
-      return false;
-    }) || [];
-    
-    // Check the latest non-expired log status - if attempted, flag as weak
-    const latestNonExpiredLog = nonExpiredLogs.length > 0 
-      ? nonExpiredLogs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0]
-      : null;
-    
-    if (latestNonExpiredLog && latestNonExpiredLog.status === 'attempted') {
-      return 'weak';
-    }
-    
-    // If no non-expired logs, return weak (expired)
-    if (nonExpiredLogs.length === 0) {
-      return 'weak';
-    }
-    
-    const difficulty = problem.difficulty.toLowerCase();
-    let baseReadiness: string;
-
-    // Convert timeSpent from seconds to minutes for readiness calculation
-    const timeSpentMinutes = timeSpent / 60;
-
-    // Calculate base readiness based on difficulty and time (thresholds in minutes)
-    if (difficulty === 'easy') {
-      if (timeSpentMinutes < 10) {
-        baseReadiness = 'mastered';
-      } else if (timeSpentMinutes <= 20) {
-        baseReadiness = 'revisit';
-      } else {
-        baseReadiness = 'weak';
-      }
-    } else if (difficulty === 'medium') {
-      if (timeSpentMinutes < 25) {
-        baseReadiness = 'mastered';
-      } else if (timeSpentMinutes <= 40) {
-        baseReadiness = 'revisit';
-      } else {
-        baseReadiness = 'weak';
-      }
-    } else if (difficulty === 'hard') {
-      if (timeSpentMinutes < 45) {
-        baseReadiness = 'mastered';
-      } else if (timeSpentMinutes <= 75) {
-        baseReadiness = 'revisit';
-      } else {
-        baseReadiness = 'weak';
-      }
-    } else {
-      return '-';
-    }
-    
-    // Check if mastered and last logged > 1 month ago
-    if (baseReadiness === 'mastered') {
-      const solvedDate = new Date(solvedAt);
-      const oneMonthAgo = new Date();
-      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-      
-      if (solvedDate < oneMonthAgo) {
-        return 'rusty';
-      }
-    }
-    
-    return baseReadiness;
-  };
-
-  const getReadinessBadge = (readiness: string) => {
-    switch (readiness.toLowerCase()) {
-      case 'mastered':
-        return 'bg-green-100 text-green-700 border-green-200';
-      case 'revisit':
-        return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-      case 'weak':
-        return 'bg-red-100 text-red-700 border-red-200';
-      case 'rusty':
-        return 'bg-orange-100 text-orange-700 border-orange-200';
-      default:
-        return 'bg-gray-100 text-gray-600 border-gray-200';
-    }
-  };
-
-  const handleLogClick = (userProblem: UserProblem) => {
+  const handleLogClick = (userProblem: UserProblemWithDetails) => {
     setSelectedProblem(userProblem);
     setLogModalOpen(true);
   };
@@ -288,7 +154,7 @@ export default function DashboardClient({ userProblems: initialUserProblems }: D
     }
 
     // Update local state immediately
-    setUserProblems(prev => prev.map(up => ({
+    setUserProblemWithDetailss(prev => prev.map(up => ({
       ...up,
       logs: up.logs.filter(log => log.id !== logId)
     })));
@@ -558,7 +424,7 @@ export default function DashboardClient({ userProblems: initialUserProblems }: D
                     }
                     return (
                       <span
-                        className={`inline-block px-2 py-0.5 text-xs font-medium rounded-sm border capitalize ${getReadinessBadge(readiness)}`}
+                        className={`inline-block px-2 py-0.5 text-xs font-medium rounded-sm border capitalize ${getReadinessBadgeClasses(readiness)}`}
                         style={{ fontFamily: 'var(--font-jost)' }}
                       >
                         {readiness}
