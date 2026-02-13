@@ -99,4 +99,4 @@ MIT
 
 ## Links
 
-- [leetlog.net](https://www.leetlog.net)
+[leetlog.net](https://www.leetlog.net)
